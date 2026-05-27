@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hero Background Section */
+.hero-bg {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.45)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuAP1VgJguGXm7HljGI0fHR_hvl15-3s9F7tG2GEGQcfeLvz4hlAMb_E-8sDfx6wasIAj6Fe49KuXUooyEzBq7OQ6OPXU0uk4jsH8ZETSWDt4vjtgiHse_v-C8IDqsU1zGhEQHJ-GMBw36lWorVKNvUDTTgN8YXN-6S_lNcjiOTeA-UtTncQJLWQdQWiffn5OnqM5tCa_NwkGOfNAq-pQu0_m7hg_K1_RrZJVjplRjv5-u1TdopSQ05vCp0WXGo1doH2FfBsd-DGIzw');
+  background-size: cover;
+  background-position: center;
+  min-height: 480px;
+}
+
+/* Login Background */
+.login-bg {
+  background-image: url('/login-bg.png');
+  background-size: cover;
+  background-position: center;
+  transition: background-position 0.1s ease-out;
+}
+
+/* Micro-animations and effects */
+.scale-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.scale-hover:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08);
+}
+
+.glow-btn {
+  position: relative;
+  overflow: hidden;
+}
+.glow-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: 0.75s;
+  opacity: 0;
+}
+.glow-btn:hover::after {
+  left: 125%;
+  opacity: 1;
+}
+
+/* Scroll reveal triggers for landing page components */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
