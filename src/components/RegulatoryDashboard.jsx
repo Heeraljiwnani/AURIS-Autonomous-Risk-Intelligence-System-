@@ -6,10 +6,13 @@ import {
   ClipboardList,
   ChevronDown,
   ChevronUp,
+<<<<<<< HEAD
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
   Menu,
+=======
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
   Scale,
   Settings,
   Bell,
@@ -26,13 +29,18 @@ import {
   Info,
   Sparkles,
   Eye,
+<<<<<<< HEAD
   LogOut as LogoutIcon,
   Globe,
   User
+=======
+  LogOut as LogoutIcon
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
 } from 'lucide-react';
 
 export default function RegulatoryDashboard({ onNavigate }) {
   // Sidebar state
+<<<<<<< HEAD
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activeSidebar, setActiveSidebar] = useState(() => {
     return localStorage.getItem('auris_active_sidebar') || 'agent';
@@ -67,6 +75,10 @@ export default function RegulatoryDashboard({ onNavigate }) {
   useEffect(() => {
     localStorage.setItem('auris_language', currentLanguage);
   }, [currentLanguage]);
+=======
+  const [activeSidebar, setActiveSidebar] = useState('agent'); // 'agent' | 'map' | 'validation'
+  const [assignmentsExpanded, setAssignmentsExpanded] = useState(true);
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
   
   // Dashboard workflow views
   const [currentView, setCurrentView] = useState('upload'); // 'upload' | 'scanning' | 'report'
@@ -76,6 +88,7 @@ export default function RegulatoryDashboard({ onNavigate }) {
   
   // Map Generator states
   const [mapTab, setMapTab] = useState('banking');
+<<<<<<< HEAD
   const [isTaskExpanded, setIsTaskExpanded] = useState(false);
   const [checkedDirectives, setCheckedDirectives] = useState(() => {
     const saved = localStorage.getItem('auris_checked_directives');
@@ -103,15 +116,37 @@ export default function RegulatoryDashboard({ onNavigate }) {
 
   const handleSendAssignment = () => {
     const totalSelected = Object.values(checkedDirectives).filter(Boolean).length;
+=======
+  const [isTaskExpanded, setIsTaskExpanded] = useState(true);
+  const [checkedDirectives, setCheckedDirectives] = useState({});
+  const [checkedTasks, setCheckedTasks] = useState({});
+
+  const handleToggleDirective = (id) => {
+    setCheckedDirectives(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleToggleTask = (id) => {
+    setCheckedTasks(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleSendAssignment = () => {
+    const totalSelected = Object.values(checkedDirectives).filter(Boolean).length + 
+                         Object.values(checkedTasks).filter(Boolean).length;
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
     if (totalSelected === 0) {
       setToast("Please select at least one directive or task to assign.");
     } else {
       setToast(`Successfully assigned ${totalSelected} items to digital oversight desks.`);
       setCheckedDirectives({});
+<<<<<<< HEAD
+=======
+      setCheckedTasks({});
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
     }
   };
 
   const renderTaskCard = (id, title, desc) => (
+<<<<<<< HEAD
     <div 
       key={id}
       className="block p-4 rounded-xl border border-white/20 bg-white/10 transition-all duration-350 hover:bg-white/15"
@@ -133,6 +168,29 @@ export default function RegulatoryDashboard({ onNavigate }) {
         <p className="text-[11.5px] text-white/40 max-w-[240px] leading-relaxed mx-auto">Select available directives in the left panel to assign and dispatch digital oversight tasks.</p>
       </div>
     </div>
+=======
+    <label 
+      key={id}
+      className={`block p-4 rounded-xl border transition-all cursor-pointer ${
+        checkedTasks[id] 
+          ? "bg-white/15 border-white/30" 
+          : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <input 
+          type="checkbox" 
+          checked={!!checkedTasks[id]}
+          onChange={() => handleToggleTask(id)}
+          className="mt-1 rounded border-white/30 text-white focus:ring-offset-0 focus:ring-0 h-4.5 w-4.5 cursor-pointer bg-transparent"
+        />
+        <div className="space-y-1">
+          <span className="text-sm font-bold block leading-none text-white">{title}</span>
+          <p className="text-[11px] text-white/70 font-semibold leading-relaxed">{desc}</p>
+        </div>
+      </div>
+    </label>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
   );
   
   // Custom toast notification
@@ -150,6 +208,7 @@ export default function RegulatoryDashboard({ onNavigate }) {
     }
   ]);
   const chatEndRef = useRef(null);
+<<<<<<< HEAD
   const fileInputRef = useRef(null);
 
   // Save active sidebar on change
@@ -161,6 +220,8 @@ export default function RegulatoryDashboard({ onNavigate }) {
   useEffect(() => {
     localStorage.setItem('auris_checked_directives', JSON.stringify(checkedDirectives));
   }, [checkedDirectives]);
+=======
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
 
   // Auto-dismiss toast
   useEffect(() => {
@@ -271,6 +332,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
   const handleFileDrop = (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     const file = e.dataTransfer.files[0];
     if (file) {
       if (!file.name.toLowerCase().endsWith('.pdf')) {
@@ -308,6 +370,19 @@ Analytical user metadata and training weights may be relayed to globally distrib
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
+=======
+    setToast("Document received for autonomous verification.");
+    setSelectedFile({ name: "Uploaded_Policy_Charter.pdf", size: "1.2 MB" });
+    setScanStep(0);
+    setCurrentView('scanning');
+  };
+
+  const selectFileManual = () => {
+    setToast("Preset file loaded for autonomous audit.");
+    setSelectedFile({ name: presets[0].title, size: presets[0].size });
+    setScanStep(0);
+    setCurrentView('scanning');
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
   };
 
   const handleActionView = (actionType) => {
@@ -369,13 +444,18 @@ Analytical user metadata and training weights may be relayed to globally distrib
       
       {/* Toast Notification */}
       {toast && (
+<<<<<<< HEAD
         <div className="fixed bottom-6 right-6 z-50 bg-[#003262] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-white/10 animate-bounce">
+=======
+        <div className="fixed bottom-6 right-6 z-50 bg-[#000a1e] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-white/10 animate-bounce">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
           <Sparkles className="text-yellow-400 h-4.5 w-4.5" />
           <span className="text-xs font-bold">{toast}</span>
         </div>
       )}
 
       {/* Left Sidebar Navigation - STITCH PERFECT DESIGN */}
+<<<<<<< HEAD
       <aside className={`relative bg-[#edeeef] flex flex-col border-r border-[#c4c6cf] z-30 transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-20' : 'w-72'}`}>
         {/* Brand Identity & Collapse Control */}
         <div className={`p-6 flex items-center transition-all duration-300 ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
@@ -507,11 +587,75 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 >
                   Operation & Support
                 </button>
+=======
+      <aside className="w-72 bg-[#edeeef] flex flex-col border-r border-[#c4c6cf] z-30">
+        
+        {/* Brand Identity */}
+        <div className="p-6 flex items-center gap-2">
+          <img 
+            alt="Ashoka Emblem" 
+            className="h-9 w-auto object-contain filter drop-shadow-sm" 
+            src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg"
+          />
+          <div className="w-9 h-9 bg-[#000a1e] rounded-lg flex items-center justify-center text-white shadow-md flex-shrink-0">
+            <Shield className="h-4.5 w-4.5 fill-current text-white" />
+          </div>
+          <span className="text-xl font-bold tracking-tight text-[#000a1e] font-public uppercase">AURIS</span>
+        </div>
+
+        {/* Navigation Items */}
+        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar">
+          
+          <button 
+            onClick={() => { setActiveSidebar('agent'); setCurrentView('upload'); setSelectedFile(null); }}
+            className={`w-full flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-200 text-left ${
+              activeSidebar === 'agent' 
+                ? "text-[#000a1e] bg-gradient-to-r from-[#000a1e]/5 to-transparent border-l-4 border-[#000a1e]" 
+                : "text-[#44474e] hover:bg-[#e7e8e9]"
+            }`}
+          >
+            <TrendingUp className="h-5 w-5" />
+            <span className="text-sm">Regulatory Monitoring Agent</span>
+          </button>
+
+          <button 
+            onClick={() => { setActiveSidebar('map'); }}
+            className={`w-full flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-200 text-left ${
+              activeSidebar === 'map' 
+                ? "text-[#000a1e] bg-gradient-to-r from-[#000a1e]/5 to-transparent border-l-4 border-[#000a1e]" 
+                : "text-[#44474e] hover:bg-[#e7e8e9]"
+            }`}
+          >
+            <Map className="h-5 w-5" />
+            <span className="text-sm">Map Generator</span>
+          </button>
+
+          {/* Expandable Section */}
+          <div className="pt-2">
+            <button 
+              onClick={() => setAssignmentsExpanded(!assignmentsExpanded)}
+              className="w-full flex items-center justify-between px-6 py-3 rounded-xl font-bold text-[#44474e] hover:bg-[#e7e8e9] transition-all"
+            >
+              <div className="flex items-center gap-3">
+                <ClipboardList className="h-5 w-5" />
+                <span className="text-sm">Assignments</span>
+              </div>
+              {assignmentsExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+
+            {assignmentsExpanded && (
+              <div className="ml-10 mt-1 space-y-1 border-l border-[#c4c6cf] pl-4 text-left">
+                <button onClick={() => setToast("Loading Customer Banking audits...")} className="block w-full text-left py-1.5 text-xs text-[#44474e] font-semibold hover:text-[#000a1e] hover:translate-x-1 transition-all">Customer Banking</button>
+                <button onClick={() => setToast("Loading Loans & Finance audits...")} className="block w-full text-left py-1.5 text-xs text-[#44474e] font-semibold hover:text-[#000a1e] hover:translate-x-1 transition-all">Loans & Finance</button>
+                <button onClick={() => setToast("Loading Technology & Security audits...")} className="block w-full text-left py-1.5 text-xs text-[#44474e] font-semibold hover:text-[#000a1e] hover:translate-x-1 transition-all">Technology & Security</button>
+                <button onClick={() => setToast("Loading Operation & Support audits...")} className="block w-full text-left py-1.5 text-xs text-[#44474e] font-semibold hover:text-[#000a1e] hover:translate-x-1 transition-all">Operation & Support</button>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
               </div>
             )}
           </div>
 
           <button 
+<<<<<<< HEAD
             onClick={() => { navigateToSidebar('validation'); }}
             title={isSidebarCollapsed ? "Validation" : undefined}
             className={`w-full flex items-center transition-all duration-200 ${
@@ -526,17 +670,52 @@ Analytical user metadata and training weights may be relayed to globally distrib
           >
             <ShieldCheck className="h-5 w-5 flex-shrink-0" />
             {!isSidebarCollapsed && <span className="text-sm">Validation</span>}
+=======
+            onClick={() => setActiveSidebar('validation')}
+            className={`w-full flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-200 text-left ${
+              activeSidebar === 'validation' 
+                ? "text-[#000a1e] bg-gradient-to-r from-[#000a1e]/5 to-transparent border-l-4 border-[#000a1e]" 
+                : "text-[#44474e] hover:bg-[#e7e8e9]"
+            }`}
+          >
+            <ShieldCheck className="h-5 w-5" />
+            <span className="text-sm">Validation</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </button>
 
         </nav>
 
+<<<<<<< HEAD
 
+=======
+        {/* Bottom Profile Info */}
+        <div className="p-6 border-t border-[#c4c6cf] bg-[#f3f4f5] flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-[#82cfff]/30 text-[#001e2d] flex items-center justify-center font-bold">
+              SA
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-bold text-[#000a1e] leading-none">System Admin</p>
+              <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#44474e] mt-1">Active Oversight</p>
+            </div>
+          </div>
+          
+          <button 
+            onClick={() => onNavigate('login')}
+            title="Sign Out"
+            className="p-1.5 text-slate-500 hover:text-rose-600 rounded-lg hover:bg-slate-200/50 transition-colors"
+          >
+            <LogoutIcon className="h-4.5 w-4.5" />
+          </button>
+        </div>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
       </aside>
 
       {/* Main Panel Content Area */}
       <main className="flex-grow flex flex-col relative overflow-hidden bg-[#f8f9fa]">
         
         {/* Top Navbar */}
+<<<<<<< HEAD
         <header className="relative z-40 w-full px-12 py-3 flex justify-between items-center bg-[#f8f9fa]/85 backdrop-blur-md border-b border-[#c4c6cf] shadow-[0_2px_12px_-5px_rgba(0,0,0,0.05)] transition-all duration-300">
           
           {/* Left panel oversight spacing placeholder */}
@@ -641,12 +820,36 @@ Analytical user metadata and training weights may be relayed to globally distrib
               )}
             </div>
 
+=======
+        <header className="relative z-10 w-full px-12 py-3 flex justify-between items-center bg-[#f8f9fa]/80 backdrop-blur-md border-b border-[#c4c6cf]">
+          <div className="flex items-center gap-2 text-[#44474e] font-bold text-xs">
+            <Scale className="h-4 w-4" />
+            <span>Intelligence Oversight Panel</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span className="text-[9px] font-bold uppercase tracking-widest">Network Secure</span>
+            </span>
+
+            <button 
+              onClick={() => alert("Opening general oversight parameters...")}
+              className="text-[#44474e] hover:text-[#000a1e] transition-colors"
+            >
+              <Settings className="h-4.5 w-4.5" />
+            </button>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </div>
         </header>
 
         {/* Switch Views Based on Active Sidebar Link */}
         {activeSidebar === 'agent' && (
+<<<<<<< HEAD
           <div className="flex-grow flex flex-col relative overflow-y-auto custom-scrollbar h-full">
+=======
+          <div className="flex-grow flex flex-col relative">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
             
             {/* Background image map overlay (exactly matching screenshot specs) */}
             <div className="absolute inset-0 z-0 opacity-[0.04] pointer-events-none">
@@ -659,6 +862,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
             {/* STITCH UPLOAD SCREEN STATE (Matches your screenshot exactly!) */}
             {currentView === 'upload' && (
+<<<<<<< HEAD
               <div className="relative z-10 flex-grow flex flex-col items-start justify-start px-12 py-10 w-full space-y-10">
                 
                 {/* Titles */}
@@ -727,6 +931,61 @@ Analytical user metadata and training weights may be relayed to globally distrib
                     </button>
                   </div>
 
+=======
+              <div className="relative z-10 flex-grow flex flex-col items-center justify-center px-6 py-12 max-w-4xl mx-auto w-full space-y-10">
+                
+                {/* Titles */}
+                <div className="text-center space-y-3.5">
+                  <span className="text-[#00658d] font-bold text-xs tracking-[0.2em] uppercase block">
+                    Autonomous Unified Risk Intelligence System
+                  </span>
+                  <h1 className="text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-none font-public">
+                    Regulatory Monitoring Agent
+                  </h1>
+                  <p className="text-slate-600 text-sm md:text-[15px] font-semibold leading-relaxed max-w-3xl mx-auto">
+                    Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.
+                  </p>
+                </div>
+
+                {/* PDF Upload Box (STITCH EXACT DETAILS) */}
+                <div 
+                  id="drop-zone"
+                  onDragOver={(e) => { e.preventDefault(); }}
+                  onDrop={handleFileDrop}
+                  onClick={selectFileManual}
+                  className="w-full max-w-3xl bg-white py-20 px-12 min-h-[380px] rounded-2xl flex flex-col items-center justify-center gap-6 cursor-pointer border-2 border-dashed border-[#c4c6cf] hover:border-[#000a1e] hover:bg-[#edeeef]/40 transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] shadow-sm group"
+                >
+                  <div className="w-20 h-20 bg-[#d6e3ff] rounded-full flex items-center justify-center text-[#000a1e] transition-transform group-hover:scale-105 duration-300 shadow-inner">
+                    <FileText className="h-10 w-10 text-[#000a1e]" />
+                  </div>
+                  
+                  <div className="text-center space-y-1">
+                    <h3 className="text-lg font-bold text-[#000a1e]">Drag &amp; Drop Documents</h3>
+                    <p className="text-xs font-semibold text-[#44474e]">Limit 50MB per file. Supported format: .PDF only.</p>
+                  </div>
+                  
+                  <button className="px-6 py-2.5 bg-[#000a1e] hover:bg-[#000a1e]/90 text-white text-xs font-bold rounded-lg hover:shadow-md transition-all">
+                    Browse Files
+                  </button>
+                </div>
+
+                {/* Lower Action buttons */}
+                <div className="flex flex-wrap justify-center gap-6 w-full max-w-2xl">
+                  <button 
+                    onClick={() => handleActionView('Direct Compliance Analysis')}
+                    className="flex items-center gap-2.5 px-8 py-3.5 bg-[#000a1e] hover:bg-[#000a1e]/90 text-white font-bold text-xs rounded-lg hover:shadow-md transition-all active:scale-95 w-64 justify-center"
+                  >
+                    <Eye className="h-4.5 w-4.5" />
+                    View Result
+                  </button>
+                  <button 
+                    onClick={() => handleActionView('Legal Interpretation Framework')}
+                    className="flex items-center gap-2.5 px-8 py-3.5 bg-white border-2 border-[#000a1e] text-[#000a1e] font-bold text-xs rounded-lg hover:bg-[#d6e3ff]/40 transition-all active:scale-95 w-64 justify-center"
+                  >
+                    <Scale className="h-4.5 w-4.5" />
+                    View Legal Interpretation
+                  </button>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                 </div>
 
               </div>
@@ -744,7 +1003,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                   </div>
 
                   <div className="space-y-1">
+<<<<<<< HEAD
                     <h3 className="text-lg font-bold text-[#003262]">Autonomous Compliance Scan Active</h3>
+=======
+                    <h3 className="text-lg font-bold text-[#000a1e]">Autonomous Compliance Scan Active</h3>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     <p className="text-xs text-[#44474e] font-semibold">Running regulatory auditing protocols on "{selectedFile?.name}"...</p>
                   </div>
 
@@ -787,34 +1050,57 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
             {/* GORGEOUS COMPLIANCE ANALYSIS REPORT SCREEN */}
             {currentView === 'report' && (
+<<<<<<< HEAD
               <div className="relative z-10 flex-grow p-8 max-w-7xl w-full mx-auto space-y-6">
+=======
+              <div className="relative z-10 flex-grow overflow-y-auto p-8 max-w-7xl w-full mx-auto space-y-6 custom-scrollbar">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                 
                 {/* Back to upload and audit details panel */}
                 <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm text-left">
                   <div className="flex items-center gap-3">
+<<<<<<< HEAD
                     <div className="p-2 bg-[rgba(188, 155, 106, 0.2)] text-[#003262] rounded-xl">
+=======
+                    <div className="p-2 bg-[#d6e3ff] text-[#000a1e] rounded-xl">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                       <FileCheck className="h-5 w-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
+<<<<<<< HEAD
                         <span className="font-bold text-sm text-[#003262]">{selectedFile?.name}</span>
                         <span className="text-[11px] font-extrabold bg-[#82cfff]/20 text-[#001e2d] px-2 py-0.5 rounded uppercase">Verified Report</span>
                       </div>
                       <p className="text-[11px] text-[#44474e] font-semibold">Audit SHA-256 Hash ID: AURIS-SHA-77A912F</p>
+=======
+                        <span className="font-bold text-sm text-[#000a1e]">{selectedFile?.name}</span>
+                        <span className="text-[10px] font-extrabold bg-[#82cfff]/20 text-[#001e2d] px-2 py-0.5 rounded uppercase">Verified Report</span>
+                      </div>
+                      <p className="text-[10px] text-[#44474e] font-semibold">Audit SHA-256 Hash ID: AURIS-SHA-77A912F</p>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => { setScanStep(0); setCurrentView('scanning'); }}
+<<<<<<< HEAD
                       className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 text-[#44474e] font-bold text-[12px] rounded-xl flex items-center gap-1 transition-all"
+=======
+                      className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 text-[#44474e] font-bold text-[11px] rounded-xl flex items-center gap-1 transition-all"
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     >
                       <RefreshCw className="h-3 w-3" />
                       Recalculate
                     </button>
                     <button 
                       onClick={() => { setSelectedFile(null); setCurrentView('upload'); }}
+<<<<<<< HEAD
                       className="px-3.5 py-1.5 bg-[#003262] text-white font-bold text-[12px] rounded-xl hover:shadow-md transition-all"
+=======
+                      className="px-3.5 py-1.5 bg-[#000a1e] text-white font-bold text-[11px] rounded-xl hover:shadow-md transition-all"
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     >
                       New Audit
                     </button>
@@ -826,7 +1112,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                   
                   {/* Gauge score card */}
                   <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 shadow-sm flex flex-col items-center justify-between min-h-[150px]">
+<<<<<<< HEAD
                     <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Compliance Index</span>
+=======
+                    <span className="text-[10px] font-extrabold text-[#44474e] uppercase tracking-wider">Compliance Index</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     
                     <div className="relative w-16 h-16 flex items-center justify-center my-2">
                       <svg className="w-16 h-16 transform -rotate-90">
@@ -841,31 +1131,56 @@ Analytical user metadata and training weights may be relayed to globally distrib
                           strokeLinecap="round"
                         />
                       </svg>
+<<<<<<< HEAD
                       <span className="absolute text-base font-black text-[#003262]">{activePreset.complianceScore}%</span>
                     </div>
 
                     <span className="text-[11px] font-bold uppercase bg-emerald-50 text-emerald-800 px-3 py-0.5 rounded-full">{activePreset.status}</span>
+=======
+                      <span className="absolute text-base font-black text-[#000a1e]">{activePreset.complianceScore}%</span>
+                    </div>
+
+                    <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 px-3 py-0.5 rounded-full">{activePreset.status}</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   </div>
 
                   {/* Risks Found */}
                   <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 shadow-sm flex flex-col items-center justify-between min-h-[150px]">
+<<<<<<< HEAD
                     <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Risks Detected</span>
                     <span className="text-3xl font-black text-rose-600 my-auto">{activePreset.infractionsCount}</span>
                     <span className="text-[11px] text-rose-600 font-bold uppercase flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" />Action Demanded</span>
+=======
+                    <span className="text-[10px] font-extrabold text-[#44474e] uppercase tracking-wider">Risks Detected</span>
+                    <span className="text-3xl font-black text-rose-600 my-auto">{activePreset.infractionsCount}</span>
+                    <span className="text-[10px] text-rose-600 font-bold uppercase flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" />Action Demanded</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   </div>
 
                   {/* Critical Issues */}
                   <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 shadow-sm flex flex-col items-center justify-between min-h-[150px]">
+<<<<<<< HEAD
                     <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Critical Mismatch</span>
                     <span className="text-3xl font-black text-rose-800 my-auto">{activePreset.risks.critical}</span>
                     <span className="text-[11px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded">High Severity</span>
+=======
+                    <span className="text-[10px] font-extrabold text-[#44474e] uppercase tracking-wider">Critical Mismatch</span>
+                    <span className="text-3xl font-black text-rose-800 my-auto">{activePreset.risks.critical}</span>
+                    <span className="text-[10px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded">High Severity</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   </div>
 
                   {/* Warnings */}
                   <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 shadow-sm flex flex-col items-center justify-between min-h-[150px]">
+<<<<<<< HEAD
                     <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Friction Warnings</span>
                     <span className="text-3xl font-black text-amber-600 my-auto">{activePreset.risks.warning}</span>
                     <span className="text-[11px] bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded">Moderate Level</span>
+=======
+                    <span className="text-[10px] font-extrabold text-[#44474e] uppercase tracking-wider">Friction Warnings</span>
+                    <span className="text-3xl font-black text-amber-600 my-auto">{activePreset.risks.warning}</span>
+                    <span className="text-[10px] bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded">Moderate Level</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   </div>
 
                 </div>
@@ -881,7 +1196,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                       <button 
                         onClick={() => setActiveTab('infractions')}
                         className={`py-3 px-5 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+<<<<<<< HEAD
                           activeTab === 'infractions' ? "border-[#FDB515] text-[#003262] bg-white font-bold" : "border-transparent hover:text-slate-900"
+=======
+                          activeTab === 'infractions' ? "border-[#000a1e] text-[#000a1e] bg-white font-bold" : "border-transparent hover:text-slate-900"
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         }`}
                       >
                         <AlertTriangle className="h-4 w-4" />
@@ -890,7 +1209,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                       <button 
                         onClick={() => setActiveTab('matrix')}
                         className={`py-3 px-5 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+<<<<<<< HEAD
                           activeTab === 'matrix' ? "border-[#FDB515] text-[#003262] bg-white font-bold" : "border-transparent hover:text-slate-900"
+=======
+                          activeTab === 'matrix' ? "border-[#000a1e] text-[#000a1e] bg-white font-bold" : "border-transparent hover:text-slate-900"
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         }`}
                       >
                         <ShieldCheck className="h-4 w-4" />
@@ -899,7 +1222,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                       <button 
                         onClick={() => setActiveTab('draft')}
                         className={`py-3 px-5 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
+<<<<<<< HEAD
                           activeTab === 'draft' ? "border-[#FDB515] text-[#003262] bg-white font-bold" : "border-transparent hover:text-slate-900"
+=======
+                          activeTab === 'draft' ? "border-[#000a1e] text-[#000a1e] bg-white font-bold" : "border-transparent hover:text-slate-900"
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         }`}
                       >
                         <FileText className="h-4 w-4" />
@@ -912,24 +1239,40 @@ Analytical user metadata and training weights may be relayed to globally distrib
                       
                       {activeTab === 'infractions' && (
                         <div className="space-y-4">
+<<<<<<< HEAD
                           <h3 className="text-sm font-bold text-[#003262]">Identified Non-Compliant Clauses</h3>
+=======
+                          <h3 className="text-sm font-bold text-[#000a1e]">Identified Non-Compliant Clauses</h3>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                           
                           <div className="space-y-3">
                             {activePreset.infractions.map((inf) => (
                               <div key={inf.id} className="border border-slate-200 rounded-xl overflow-hidden text-xs">
                                 <div className="bg-slate-50 p-3 flex justify-between items-center border-b border-slate-200">
+<<<<<<< HEAD
                                   <span className={`text-[11px] font-extrabold uppercase px-2 py-0.5 rounded ${
+=======
+                                  <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded ${
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                                     inf.severity === "Critical" ? "bg-rose-50 text-rose-700" : "bg-amber-50 text-amber-700"
                                   }`}>{inf.severity}</span>
                                   <span className="font-bold text-slate-800">{inf.clause}</span>
                                 </div>
                                 <div className="p-4 space-y-3">
                                   <p className="font-semibold text-rose-950 bg-rose-500/10 p-2.5 rounded border border-rose-500/10 leading-relaxed">
+<<<<<<< HEAD
                                     <span className="font-extrabold block text-[11px] text-rose-800 uppercase tracking-wider mb-0.5">Found Infraction</span>
                                     {inf.infraction} ({inf.standard})
                                   </p>
                                   <p className="text-slate-600 font-medium leading-relaxed bg-emerald-500/5 p-2.5 rounded border border-emerald-500/5">
                                     <span className="font-extrabold block text-[11px] text-emerald-800 uppercase tracking-wider mb-0.5">AI Mitigating Directive</span>
+=======
+                                    <span className="font-extrabold block text-[9.5px] text-rose-800 uppercase tracking-wider mb-0.5">Found Infraction</span>
+                                    {inf.infraction} ({inf.standard})
+                                  </p>
+                                  <p className="text-slate-600 font-medium leading-relaxed bg-emerald-500/5 p-2.5 rounded border border-emerald-500/5">
+                                    <span className="font-extrabold block text-[9.5px] text-emerald-800 uppercase tracking-wider mb-0.5">AI Mitigating Directive</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                                     {inf.mitigation}
                                   </p>
                                 </div>
@@ -941,7 +1284,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                       {activeTab === 'matrix' && (
                         <div className="space-y-4">
+<<<<<<< HEAD
                           <h3 className="text-sm font-bold text-[#003262]">Sovereign Statute Compatibility Report</h3>
+=======
+                          <h3 className="text-sm font-bold text-[#000a1e]">Sovereign Statute Compatibility Report</h3>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                           <div className="border border-slate-200 rounded-xl overflow-hidden">
                             <table className="w-full text-xs">
                               <thead>
@@ -956,13 +1303,21 @@ Analytical user metadata and training weights may be relayed to globally distrib
                                   <tr key={idx} className="hover:bg-slate-50/50">
                                     <td className="py-3 px-4 font-bold text-slate-900">{row.item}</td>
                                     <td className="py-3 px-4">
+<<<<<<< HEAD
                                       <span className={`text-[10.5px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+=======
+                                      <span className={`text-[8.5px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                                         row.status === "Compliant" ? "bg-emerald-50 text-emerald-700" :
                                         row.status === "Partial Deficit" ? "bg-amber-50 text-amber-700" :
                                         "bg-rose-50 text-rose-700"
                                       }`}>{row.status}</span>
                                     </td>
+<<<<<<< HEAD
                                     <td className="py-3 px-4 text-xs leading-relaxed text-slate-500">{row.detail}</td>
+=======
+                                    <td className="py-3 px-4 text-[11px] leading-relaxed text-slate-500">{row.detail}</td>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                                   </tr>
                                 ))}
                               </tbody>
@@ -973,8 +1328,13 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                       {activeTab === 'draft' && (
                         <div className="space-y-3">
+<<<<<<< HEAD
                           <h3 className="text-sm font-bold text-[#003262]">Parsed Regulatory Policy Text</h3>
                           <div className="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-[12px] leading-relaxed max-h-[250px] overflow-y-auto custom-scrollbar">
+=======
+                          <h3 className="text-sm font-bold text-[#000a1e]">Parsed Regulatory Policy Text</h3>
+                          <div className="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-[10px] leading-relaxed max-h-[250px] overflow-y-auto custom-scrollbar">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                             <pre className="whitespace-pre-wrap">{activePreset.text}</pre>
                           </div>
                         </div>
@@ -987,6 +1347,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
                   <div className="lg:col-span-4 bg-white border border-[#c4c6cf] rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[480px]">
                     
                     {/* Chat Header */}
+<<<<<<< HEAD
                     <div className="bg-[#003262] text-white p-4 flex items-center justify-between border-b border-slate-800">
                       <div className="flex items-center gap-2">
                         <div className="h-8 w-8 bg-[rgba(188, 155, 106, 0.2)] rounded-lg flex items-center justify-center text-[#003262] relative">
@@ -996,6 +1357,17 @@ Analytical user metadata and training weights may be relayed to globally distrib
                         <div className="text-left leading-none">
                           <h4 className="text-xs font-bold uppercase tracking-wider">AURIS Copilot</h4>
                           <span className="text-[10.5px] text-emerald-400 font-extrabold uppercase mt-0.5 block">Audit Active</span>
+=======
+                    <div className="bg-[#000a1e] text-white p-4 flex items-center justify-between border-b border-slate-800">
+                      <div className="flex items-center gap-2">
+                        <div className="h-8 w-8 bg-[#d6e3ff] rounded-lg flex items-center justify-center text-[#000a1e] relative">
+                          <Sparkles className="h-4.5 w-4.5" />
+                          <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-400 border border-[#000a1e]"></span>
+                        </div>
+                        <div className="text-left leading-none">
+                          <h4 className="text-[11px] font-bold uppercase tracking-wider">AURIS Copilot</h4>
+                          <span className="text-[8px] text-emerald-400 font-extrabold uppercase mt-0.5 block">Audit Active</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         </div>
                       </div>
                     </div>
@@ -1012,7 +1384,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                           }`}
                         >
                           <p>{msg.text}</p>
+<<<<<<< HEAD
                           <span className="text-[9.5px] opacity-75 mt-1 block text-right font-bold">{msg.timestamp}</span>
+=======
+                          <span className="text-[7.5px] opacity-75 mt-1 block text-right font-bold">{msg.timestamp}</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         </div>
                       ))}
 
@@ -1028,10 +1404,17 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                     {/* Suggestions chips */}
                     <div className="p-3 bg-white border-t border-slate-100 text-left space-y-1.5">
+<<<<<<< HEAD
                       <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest block">Inquire details</span>
                       <div className="flex flex-col gap-1">
                         <button onClick={() => handleChipClick("What are the major data sovereignty concerns in this document?")} className="text-[11px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg py-1 px-2 text-left transition-colors">Analyze data sovereignty</button>
                         <button onClick={() => handleChipClick("How do we mitigate the Section 14 consent infraction?")} className="text-[11px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg py-1 px-2 text-left transition-colors">Mitigate consent infraction</button>
+=======
+                      <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-widest block">Inquire details</span>
+                      <div className="flex flex-col gap-1">
+                        <button onClick={() => handleChipClick("What are the major data sovereignty concerns in this document?")} className="text-[9px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg py-1 px-2 text-left transition-colors">Analyze data sovereignty</button>
+                        <button onClick={() => handleChipClick("How do we mitigate the Section 14 consent infraction?")} className="text-[9px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg py-1 px-2 text-left transition-colors">Mitigate consent infraction</button>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                       </div>
                     </div>
 
@@ -1042,9 +1425,15 @@ Analytical user metadata and training weights may be relayed to globally distrib
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
                         placeholder="Inquire policy issues..."
+<<<<<<< HEAD
                         className="flex-grow bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs outline-none focus:border-[#003262] placeholder-slate-400"
                       />
                       <button type="submit" className="bg-[#003262] text-white p-2 rounded-lg hover:shadow transition-all active:scale-95 flex items-center justify-center">
+=======
+                        className="flex-grow bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs outline-none focus:border-[#000a1e] placeholder-slate-400"
+                      />
+                      <button type="submit" className="bg-[#000a1e] text-white p-2 rounded-lg hover:shadow transition-all active:scale-95 flex items-center justify-center">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         <Send className="h-3.5 w-3.5" />
                       </button>
                     </form>
@@ -1056,6 +1445,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
               </div>
             )}
 
+<<<<<<< HEAD
             {/* The beautiful landing page footer! */}
             {currentView !== 'scanning' && (
               <footer className="w-full bg-slate-900 text-white py-12 border-t-4 border-orange-500 mt-12 z-20 text-center">
@@ -1093,11 +1483,14 @@ Analytical user metadata and training weights may be relayed to globally distrib
               </footer>
             )}
 
+=======
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </div>
         )}
 
         {/* Map Generator view */}
         {activeSidebar === 'map' && (
+<<<<<<< HEAD
           <div className="relative z-10 flex-grow flex flex-col w-full h-full overflow-y-auto custom-scrollbar">
             
             <div className="flex-grow flex flex-col items-start justify-start p-6 md:px-12 md:py-6 w-full space-y-5 relative z-10">
@@ -1111,6 +1504,20 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 {currentLanguage === 'hi' 
                   ? 'स्वायत्त जोखिम मूल्यांकन और कानूनी संरेखण सत्यापन के लिए संप्रभु नीति दस्तावेज या आंतरिक निर्देश अपलोड करें।' 
                   : 'Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.'}
+=======
+          <div className="relative z-10 flex-grow flex flex-col items-center justify-start p-6 md:p-12 w-full max-w-7xl mx-auto space-y-10 overflow-y-auto custom-scrollbar h-full">
+            
+            {/* Headers */}
+            <div className="text-center space-y-3.5">
+              <span className="text-[#00658d] font-bold text-xs tracking-[0.2em] uppercase block">
+                Autonomous Unified Risk Intelligence System
+              </span>
+              <h1 className="text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-none font-public">
+                Map Generator
+              </h1>
+              <p className="text-slate-600 text-sm md:text-[15px] font-semibold leading-relaxed max-w-3xl mx-auto">
+                Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
               </p>
             </div>
 
@@ -1128,14 +1535,22 @@ Analytical user metadata and training weights may be relayed to globally distrib
                     onClick={() => setIsTaskExpanded(!isTaskExpanded)}
                     className="p-5 flex justify-between items-center border-b border-slate-200 bg-slate-50/50 cursor-pointer font-bold text-slate-850"
                   >
+<<<<<<< HEAD
                     <span className="text-[15px] font-bold text-[#003262] font-public">Generate Task</span>
+=======
+                    <span className="text-[15px] font-bold text-[#000a1e] font-public">Generate Task</span>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     {isTaskExpanded ? <ChevronUp className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
                   </button>
 
                   {/* Directives List */}
                   {isTaskExpanded && (
                     <div className="p-6 space-y-4">
+<<<<<<< HEAD
                       <span className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">
+=======
+                      <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         Available Directives
                       </span>
 
@@ -1156,7 +1571,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                               type="checkbox" 
                               checked={!!checkedDirectives[item.id]}
                               onChange={() => handleToggleDirective(item.id)}
+<<<<<<< HEAD
                               className="rounded border-[#c4c6cf] text-[#003262] focus:ring-[#003262]/20 h-4.5 w-4.5 cursor-pointer"
+=======
+                              className="rounded border-[#c4c6cf] text-[#000a1e] focus:ring-[#000a1e]/20 h-4.5 w-4.5 cursor-pointer"
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                             />
                             <span className="text-xs font-semibold text-slate-855">{item.label}</span>
                           </label>
@@ -1167,7 +1586,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 </div>
 
                 {/* Right Column: Tabbed Checkbox Container */}
+<<<<<<< HEAD
                 <div className="lg:col-span-7 bg-[#001b3d] text-white rounded-2xl p-6 shadow-md flex flex-col min-h-[300px] text-left border border-slate-850">
+=======
+                <div className="lg:col-span-7 bg-[#001b3d] text-white rounded-2xl p-6 shadow-md flex flex-col min-h-[440px] text-left border border-slate-850">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   
                   {/* Horizontal Tab Headers */}
                   <div className="grid grid-cols-5 gap-1 sm:gap-2 border-b border-white/10 pb-4 text-[10px] sm:text-[11px] lg:text-xs font-bold text-white/50 mb-6 w-full text-center">
@@ -1200,6 +1623,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
                   {/* Vertical Checkbox stack */}
                   <div className="flex-grow space-y-4">
                     {mapTab === 'banking' && (
+<<<<<<< HEAD
                       (checkedDirectives['risk'] || checkedDirectives['geospatial'] || checkedDirectives['audit']) ? (
                         <>
                           {checkedDirectives['risk'] && renderTaskCard('bank1', 'Risk Assessment v1.2', 'Comprehensive verification of retail account identification standards.')}
@@ -1239,6 +1663,37 @@ Analytical user metadata and training weights may be relayed to globally distrib
                           {checkedDirectives['ops'] && renderTaskCard('sup2', 'System Load Evaluator', 'Evaluating latency spikes during peak transaction sessions.')}
                         </>
                       ) : renderEmptyPlaceholder()
+=======
+                      <>
+                        {renderTaskCard('bank1', 'Risk Assessment v1.2', 'Comprehensive verification of retail account identification standards.')}
+                        {renderTaskCard('bank2', 'Geospatial Data Synthesis', 'Geospatial analysis of irregular transaction clusters.')}
+                        {renderTaskCard('bank3', 'Compliance Audit Trace', 'Algorithmic transparency verification for SME loans.')}
+                      </>
+                    )}
+                    {mapTab === 'finance' && (
+                      <>
+                        {renderTaskCard('fin1', 'Credit Risk Classifier v2.1', 'Autonomous evaluation of digital lending profiles.')}
+                        {renderTaskCard('fin2', 'Collateral Valuation Audit', 'Verifying asset valuation integrity protocols.')}
+                      </>
+                    )}
+                    {mapTab === 'compliance' && (
+                      <>
+                        {renderTaskCard('comp1', 'DPDP Compliance Matrix', 'Validation against primary data protection laws.')}
+                        {renderTaskCard('comp2', 'Cross-Border Flow Ledger', 'Tracing international data egress tunnels.')}
+                      </>
+                    )}
+                    {mapTab === 'security' && (
+                      <>
+                        {renderTaskCard('sec1', 'Core API Threat Shield', 'Active vulnerability analysis of banking endpoints.')}
+                        {renderTaskCard('sec2', 'Tokenized Vault Scan', 'Verifying cryptographic data shielding standards.')}
+                      </>
+                    )}
+                    {mapTab === 'support' && (
+                      <>
+                        {renderTaskCard('sup1', 'Incident Report Dispatcher', 'Autonomous alert synchronization for help desks.')}
+                        {renderTaskCard('sup2', 'System Load Evaluator', 'Evaluating latency spikes during peak transaction sessions.')}
+                      </>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     )}
                   </div>
 
@@ -1246,6 +1701,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
               </div>
 
+<<<<<<< HEAD
               {/* Bottom Centered Button Inside Card */}
               <div className="w-full flex justify-center pt-5 border-t border-slate-200/20 mt-2 relative z-10">
                 <button 
@@ -1295,11 +1751,26 @@ Analytical user metadata and training weights may be relayed to globally distrib
               </div>
             </footer>
 
+=======
+            </div>
+
+            {/* Bottom Centered Button */}
+            <div className="w-full flex justify-center pt-4 relative z-10">
+              <button 
+                onClick={handleSendAssignment}
+                className="px-12 py-3.5 bg-[#000a1e] hover:bg-black text-white text-xs font-bold rounded-lg shadow-lg transition-all active:scale-95 flex items-center gap-2 border border-slate-800"
+              >
+                Submit To Assignments
+              </button>
+            </div>
+
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </div>
         )}
 
         {/* Validation view */}
         {activeSidebar === 'validation' && (
+<<<<<<< HEAD
           <div className="relative z-10 flex-grow flex flex-col w-full h-full overflow-y-auto custom-scrollbar">
             
             <div className="flex-grow flex flex-col items-start justify-start p-12 w-full text-left space-y-6 relative z-10">
@@ -1318,6 +1789,20 @@ Analytical user metadata and training weights may be relayed to globally distrib
             </div>
             
             <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl font-mono text-[11.5px] leading-relaxed text-left w-full max-w-2xl max-h-[300px] overflow-y-auto custom-scrollbar shadow-inner">
+=======
+          <div className="relative z-10 flex-grow flex flex-col items-center justify-center p-8 max-w-4xl mx-auto w-full text-center space-y-6">
+            <div className="w-16 h-16 bg-[#d6e3ff] rounded-full flex items-center justify-center text-[#000a1e] mb-4 shadow">
+              <ShieldCheck className="h-8 w-8 text-[#000a1e]" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-black text-[#000a1e] font-public">Security Ledger Validation</h2>
+              <p className="text-sm font-semibold text-[#44474e] max-w-lg leading-relaxed mx-auto">
+                Run immediate multi-factor cryptographic checks to verify sovereign hash sequence integrity and ensure data localization clearances.
+              </p>
+            </div>
+            
+            <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl font-mono text-[10px] leading-relaxed text-left w-full max-w-2xl max-h-[300px] overflow-y-auto custom-scrollbar shadow-inner">
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
               <p className="text-emerald-400 font-bold mb-1">[SYSTEM INITIALIZATION] AURIS Core Auditing Agent initialized.</p>
               <p className="text-[#82cfff] mb-1">SHA-256 Checksum: c0b6b50aabee4ad3a33d8cb70843a90c...</p>
               <p className="text-[#82cfff] mb-1">Database connection status: SECURE NODE active.</p>
@@ -1328,6 +1813,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
             
             <button 
               onClick={() => setToast("Compiling cryptographic audit proof...")}
+<<<<<<< HEAD
               className="px-8 py-3 bg-[#003262] text-white font-bold text-xs rounded-lg shadow transition-all active:scale-95"
             >
               Sign Cryptographic Verification Proof
@@ -1838,11 +2324,18 @@ Analytical user metadata and training weights may be relayed to globally distrib
               </div>
             </footer>
 
+=======
+              className="px-8 py-3 bg-[#000a1e] text-white font-bold text-xs rounded-lg shadow transition-all active:scale-95"
+            >
+              Sign Cryptographic Verification Proof
+            </button>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </div>
         )}
 
       </main>
 
+<<<<<<< HEAD
 
 
       {/* Sign Out Confirmation Modal */}
@@ -1889,6 +2382,19 @@ Analytical user metadata and training weights may be relayed to globally distrib
           </div>
         </div>
       )}
+=======
+      {/* Footer */}
+      <footer className="absolute bottom-0 left-72 right-0 border-t border-[#c4c6cf] py-3.5 px-12 bg-white/95 backdrop-blur z-20 text-[10.5px] text-[#44474e] font-bold">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <p>© 2026 Autonomous Unified Risk Intelligence System (AURIS). All rights reserved.</p>
+          <div className="flex gap-6">
+            <button onClick={() => alert("AURIS Security Standard v5.0")} className="hover:text-[#000a1e] transition-colors">Help</button>
+            <button onClick={() => alert("AURIS Privacy Protocols")} className="hover:text-[#000a1e] transition-colors">Privacy Policy</button>
+            <button onClick={() => alert("AURIS Terms of Service")} className="hover:text-[#000a1e] transition-colors">Terms of Service</button>
+          </div>
+        </div>
+      </footer>
+>>>>>>> 2160a878ded497201a77800488f680a69eeea164
 
     </div>
   );
