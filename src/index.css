@@ -7,6 +7,22 @@ html {
 body {
   font-family: 'Open Sans', sans-serif;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-smooth: always;
+}
+
+/* Ensure children elements are placed on proper rendering layers to prevent blur */
+body, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6 {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Prevent text blur caused by backdrop-filter scaling and pixel offsets */
+.backdrop-blur-md, .backdrop-blur-3xl, .backdrop-blur-xl, .backdrop-blur-\[10px\] {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 /* Custom Scrollbar */
@@ -28,10 +44,10 @@ body {
 
 /* Hero Background Section */
 .hero-bg {
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.45)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuAP1VgJguGXm7HljGI0fHR_hvl15-3s9F7tG2GEGQcfeLvz4hlAMb_E-8sDfx6wasIAj6Fe49KuXUooyEzBq7OQ6OPXU0uk4jsH8ZETSWDt4vjtgiHse_v-C8IDqsU1zGhEQHJ-GMBw36lWorVKNvUDTTgN8YXN-6S_lNcjiOTeA-UtTncQJLWQdQWiffn5OnqM5tCa_NwkGOfNAq-pQu0_m7hg_K1_RrZJVjplRjv5-u1TdopSQ05vCp0WXGo1doH2FfBsd-DGIzw');
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.45)), url('/india_gate_sunset.png');
   background-size: cover;
   background-position: center;
-  min-height: 480px;
+  min-height: 100vh;
 }
 
 /* Login Background */
@@ -40,6 +56,9 @@ body {
   background-size: cover;
   background-position: center;
   transition: background-position 0.1s ease-out;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  image-rendering: -webkit-optimize-contrast;
 }
 
 /* Micro-animations and effects */
@@ -88,4 +107,36 @@ body {
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Workflow vertical connecting line style */
+.workflow-line {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #3b82f6 0%, #1e40af 100%);
+  z-index: 0;
+}
+
+@media (min-width: 768px) {
+  .workflow-line {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Cascading delays for staggered scroll reveals */
+.delay-100 {
+  transition-delay: 100ms !important;
+}
+.delay-200 {
+  transition-delay: 200ms !important;
+}
+.delay-300 {
+  transition-delay: 300ms !important;
+}
+.delay-400 {
+  transition-delay: 400ms !important;
 }
