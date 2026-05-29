@@ -7,7 +7,6 @@ html {
 body {
   font-family: 'Open Sans', sans-serif;
   overflow-x: hidden;
-<<<<<<< HEAD
   text-rendering: optimizeLegibility !important;
   -webkit-font-smoothing: antialiased !important;
   -moz-osx-font-smoothing: grayscale !important;
@@ -24,8 +23,6 @@ body, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6 {
 .backdrop-blur-md, .backdrop-blur-3xl, .backdrop-blur-xl, .backdrop-blur-\[10px\] {
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
-=======
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
 }
 
 /* Custom Scrollbar */
@@ -47,17 +44,10 @@ body, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6 {
 
 /* Hero Background Section */
 .hero-bg {
-<<<<<<< HEAD
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.45)), url('/india_gate_sunset.png');
   background-size: cover;
   background-position: center;
   min-height: 100vh;
-=======
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.45)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuAP1VgJguGXm7HljGI0fHR_hvl15-3s9F7tG2GEGQcfeLvz4hlAMb_E-8sDfx6wasIAj6Fe49KuXUooyEzBq7OQ6OPXU0uk4jsH8ZETSWDt4vjtgiHse_v-C8IDqsU1zGhEQHJ-GMBw36lWorVKNvUDTTgN8YXN-6S_lNcjiOTeA-UtTncQJLWQdQWiffn5OnqM5tCa_NwkGOfNAq-pQu0_m7hg_K1_RrZJVjplRjv5-u1TdopSQ05vCp0WXGo1doH2FfBsd-DGIzw');
-  background-size: cover;
-  background-position: center;
-  min-height: 480px;
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
 }
 
 /* Login Background */
@@ -66,12 +56,9 @@ body, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6 {
   background-size: cover;
   background-position: center;
   transition: background-position 0.1s ease-out;
-<<<<<<< HEAD
   will-change: transform;
   transform: translate3d(0, 0, 0);
   image-rendering: -webkit-optimize-contrast;
-=======
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
 }
 
 /* Micro-animations and effects */
@@ -121,7 +108,6 @@ body, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6 {
   opacity: 1;
   transform: translateY(0);
 }
-<<<<<<< HEAD
 
 /* Workflow vertical connecting line style */
 .workflow-line {
@@ -154,5 +140,3 @@ body, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6 {
 .delay-400 {
   transition-delay: 400ms !important;
 }
-=======
->>>>>>> 2160a878ded497201a77800488f680a69eeea164

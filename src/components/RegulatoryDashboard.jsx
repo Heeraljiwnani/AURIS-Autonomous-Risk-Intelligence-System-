@@ -6,13 +6,10 @@ import {
   ClipboardList,
   ChevronDown,
   ChevronUp,
-<<<<<<< HEAD
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
   Menu,
-=======
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
   Scale,
   Settings,
   Bell,
@@ -22,33 +19,25 @@ import {
   Send,
   RefreshCw,
   FileCheck,
-  LogOut,
   ShieldCheck,
   Activity,
-  Database,
-  Info,
   Sparkles,
   Eye,
-<<<<<<< HEAD
-  LogOut as LogoutIcon,
-  Globe,
-  User
-=======
+  Folder,
   LogOut as LogoutIcon
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
 } from 'lucide-react';
 
 export default function RegulatoryDashboard({ onNavigate }) {
   // Sidebar state
-<<<<<<< HEAD
+
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [activeSidebar, setActiveSidebar] = useState(() => {
     return localStorage.getItem('auris_active_sidebar') || 'agent';
   });
   const [sidebarHistory, setSidebarHistory] = useState([]);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
-  const [selectedAssignmentTab, setSelectedAssignmentTab] = useState('banking');
-  
+  const [selectedAssignmentTab, setSelectedAssignmentTab] = useState('main');
+
   const navigateToSidebar = (nextSidebar) => {
     if (activeSidebar !== nextSidebar) {
       setSidebarHistory(prev => [...prev, activeSidebar]);
@@ -75,20 +64,19 @@ export default function RegulatoryDashboard({ onNavigate }) {
   useEffect(() => {
     localStorage.setItem('auris_language', currentLanguage);
   }, [currentLanguage]);
-=======
-  const [activeSidebar, setActiveSidebar] = useState('agent'); // 'agent' | 'map' | 'validation'
-  const [assignmentsExpanded, setAssignmentsExpanded] = useState(true);
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
-  
+
+  useEffect(() => {
+    localStorage.setItem('auris_active_sidebar', activeSidebar);
+  }, [activeSidebar]);
   // Dashboard workflow views
   const [currentView, setCurrentView] = useState('upload'); // 'upload' | 'scanning' | 'report'
   const [selectedFile, setSelectedFile] = useState(null);
   const [scanStep, setScanStep] = useState(0);
   const [activeTab, setActiveTab] = useState('infractions');
-  
+
   // Map Generator states
   const [mapTab, setMapTab] = useState('banking');
-<<<<<<< HEAD
+
   const [isTaskExpanded, setIsTaskExpanded] = useState(false);
   const [checkedDirectives, setCheckedDirectives] = useState(() => {
     const saved = localStorage.getItem('auris_checked_directives');
@@ -107,7 +95,7 @@ export default function RegulatoryDashboard({ onNavigate }) {
   const handleToggleDirective = (id) => {
     const isNowChecked = !checkedDirectives[id];
     setCheckedDirectives(prev => ({ ...prev, [id]: isNowChecked }));
-    
+
     const tab = directiveMapping[id];
     if (tab && isNowChecked) {
       setMapTab(tab);
@@ -116,37 +104,15 @@ export default function RegulatoryDashboard({ onNavigate }) {
 
   const handleSendAssignment = () => {
     const totalSelected = Object.values(checkedDirectives).filter(Boolean).length;
-=======
-  const [isTaskExpanded, setIsTaskExpanded] = useState(true);
-  const [checkedDirectives, setCheckedDirectives] = useState({});
-  const [checkedTasks, setCheckedTasks] = useState({});
-
-  const handleToggleDirective = (id) => {
-    setCheckedDirectives(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleToggleTask = (id) => {
-    setCheckedTasks(prev => ({ ...prev, [id]: !prev[id] }));
-  };
-
-  const handleSendAssignment = () => {
-    const totalSelected = Object.values(checkedDirectives).filter(Boolean).length + 
-                         Object.values(checkedTasks).filter(Boolean).length;
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
     if (totalSelected === 0) {
       setToast("Please select at least one directive or task to assign.");
     } else {
       setToast(`Successfully assigned ${totalSelected} items to digital oversight desks.`);
       setCheckedDirectives({});
-<<<<<<< HEAD
-=======
-      setCheckedTasks({});
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
     }
   };
 
   const renderTaskCard = (id, title, desc) => (
-<<<<<<< HEAD
     <div 
       key={id}
       className="block p-4 rounded-xl border border-white/20 bg-white/10 transition-all duration-350 hover:bg-white/15"
@@ -168,81 +134,57 @@ export default function RegulatoryDashboard({ onNavigate }) {
         <p className="text-[11.5px] text-white/40 max-w-[240px] leading-relaxed mx-auto">Select available directives in the left panel to assign and dispatch digital oversight tasks.</p>
       </div>
     </div>
-=======
-    <label 
-      key={id}
-      className={`block p-4 rounded-xl border transition-all cursor-pointer ${
-        checkedTasks[id] 
-          ? "bg-white/15 border-white/30" 
-          : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20"
-      }`}
-    >
-      <div className="flex items-start gap-3">
-        <input 
-          type="checkbox" 
-          checked={!!checkedTasks[id]}
-          onChange={() => handleToggleTask(id)}
-          className="mt-1 rounded border-white/30 text-white focus:ring-offset-0 focus:ring-0 h-4.5 w-4.5 cursor-pointer bg-transparent"
-        />
-        <div className="space-y-1">
-          <span className="text-sm font-bold block leading-none text-white">{title}</span>
-          <p className="text-[11px] text-white/70 font-semibold leading-relaxed">{desc}</p>
-        </div>
-      </div>
-    </label>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
   );
-  
-  // Custom toast notification
-  const [toast, setToast] = useState(null);
 
-  // Chatbot states
-  const [chatInput, setChatInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [chatMessages, setChatMessages] = useState([
-    {
-      id: 1,
-      sender: 'agent',
-      text: "Hello! I am your Autonomous Risk Intelligence Agent. I have digested the uploaded document and cross-referenced it with national policies. Feel free to ask any specific compliance or risk-related questions.",
-      timestamp: 'Just now'
-    }
-  ]);
-  const chatEndRef = useRef(null);
-<<<<<<< HEAD
-  const fileInputRef = useRef(null);
+    // Custom toast notification
+    const [toast, setToast] = useState(null);
 
-  // Save active sidebar on change
-  useEffect(() => {
-    localStorage.setItem('auris_active_sidebar', activeSidebar);
-  }, [activeSidebar]);
+    // Chatbot states
+    const [chatInput, setChatInput] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
+    const [chatMessages, setChatMessages] = useState([
+      {
+        id: 1,
+        sender: 'agent',
+        text: "Hello! I am your Autonomous Risk Intelligence Agent. I have digested the uploaded document and cross-referenced it with national policies. Feel free to ask any specific compliance or risk-related questions.",
+        timestamp: 'Just now'
+      }
+    ]);
+    const chatEndRef = useRef(null);
 
-  // Save checked directives on change
-  useEffect(() => {
-    localStorage.setItem('auris_checked_directives', JSON.stringify(checkedDirectives));
-  }, [checkedDirectives]);
-=======
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
+    const fileInputRef = useRef(null);
 
-  // Auto-dismiss toast
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
+    // Save active sidebar on change
+    useEffect(() => {
+      localStorage.setItem('auris_active_sidebar', activeSidebar);
+    }, [activeSidebar]);
 
-  // Presets data for quick analysis demo
-  const presets = [
-    {
-      id: 'privacy',
-      title: "Sovereign Digital Privacy Directives 2025.pdf",
-      desc: "Comprehensive guidelines on data retention, cross-border transfers, and user consent parameters.",
-      size: "24.5 KB",
-      complianceScore: 84,
-      infractionsCount: 3,
-      risks: { critical: 1, warning: 2 },
-      status: "Partial Deficit",
-      text: `NATIONAL DIGITAL PRIVACY REGULATION DIRECTIVE (2025)
+    // Save checked directives on change
+    useEffect(() => {
+      localStorage.setItem('auris_checked_directives', JSON.stringify(checkedDirectives));
+    }, [checkedDirectives]);
+
+
+    // Auto-dismiss toast
+    useEffect(() => {
+      if (toast) {
+        const timer = setTimeout(() => setToast(null), 3000);
+        return () => clearTimeout(timer);
+      }
+    }, [toast]);
+
+    // Presets data for quick analysis demo
+    const presets = [
+      {
+        id: 'privacy',
+        title: "Sovereign Digital Privacy Directives 2025.pdf",
+        desc: "Comprehensive guidelines on data retention, cross-border transfers, and user consent parameters.",
+        size: "24.5 KB",
+        complianceScore: 84,
+        infractionsCount: 3,
+        risks: { critical: 1, warning: 2 },
+        status: "Partial Deficit",
+        text: `NATIONAL DIGITAL PRIVACY REGULATION DIRECTIVE (2025)
 Author: Ministry of Electronics & Information Technology (MeitY)
 Reference: DP-2025-SEC4
 
@@ -254,135 +196,122 @@ Sovereign user data sessions and database files will remain registered on primar
 
 CLAUSE 12.1 - GEOGRAPHIC DATA HOSTING:
 Analytical user metadata and training weights may be relayed to globally distributed edge nodes in external jurisdictions to guarantee resilient high-speed service availability, provided they utilize standard TLS 1.3 encryption structures.`,
-      infractions: [
-        {
-          id: 'inf-1',
-          clause: "Clause 4.2 - Third-Party Integrations",
-          severity: "Critical",
-          infraction: "Silent User Consent Bypass for Partner Sharing",
-          standard: "Digital Personal Data Protection (DPDP) Act 2023 - Section 6",
-          description: "Sharing transaction records and profiles with secondary affiliates without active, granular, and prominent consent prompts violates fundamental privacy norms.",
-          mitigation: "Redesign the integration layers to block automatic sharing. Introduce an explicit, granular opt-in prompt clearly outlining what data points are shared, with whom, and for what purpose."
-        },
-        {
-          id: 'inf-2',
-          clause: "Clause 8.6 - Retention Protocols",
-          severity: "Warning",
-          infraction: "Excessive Active Retention Period for Inactive Accounts",
-          standard: "DPDP Act 2023 - Section 8 (Data Minimization & Deletion)",
-          description: "Retaining personal data for 365 days post-inactivity for 'low-latency reactivation' exceeds reasonable storage minimization limits.",
-          mitigation: "Reduce active cache retention to 180 days. Implement automated background pruning scripts to archive or anonymize records once the inactive status is triggered."
-        },
-        {
-          id: 'inf-3',
-          clause: "Clause 12.1 - Geographic Data Hosting",
-          severity: "Warning",
-          infraction: "Cross-Border Transfer of Analytical Metadata",
-          standard: "Sovereign Data Storage Mandate & IT Act Sec 43A",
-          description: "Relaying operational raw metadata to external jurisdictions without auditing certificates violates local sovereign storage provisions.",
-          mitigation: "Enforce strict geofencing policies inside your cloud infrastructure. Ensure all primary analytical steps and metadata caching occur within domestic server bounds."
-        }
-      ],
-      matrix: [
-        { item: "DPDP Act Section 6 (Consent)", status: "Non-Compliant", detail: "Critical violation in Clause 4.2 (Silent sharing)" },
-        { item: "DPDP Act Section 8 (Data Deletion)", status: "Partial Deficit", detail: "Retention exceeds limits in Clause 8.6" },
-        { item: "IT Act Sec 43A (Data Protection)", status: "Compliant", detail: "Robust TLS 1.3 encryption is active" },
-        { item: "Sovereign Data Localization Rules", status: "Partial Deficit", detail: "Analytical metadata relayed to external jurisdictions" },
-        { item: "MeitY Cybersecurity Rules 2022", status: "Compliant", detail: "Security logging matches sovereign specifications" }
-      ],
-      faq: [
-        {
-          q: "What are the major data sovereignty concerns in this document?",
-          a: "The principal sovereignty risk resides in Clause 12.1, which enables analytical user metadata and training weights to be relayed to external jurisdictions. Under the Sovereign Data Localization guidelines, raw analytical summaries of local citizens must be stored and processed within domestic borders unless specific regulatory exceptions are registered."
-        },
-        {
-          q: "How do we mitigate the Section 14 consent infraction?",
-          a: "To rectify the Clause 4.2 infraction, you must eliminate the clause granting 'silent data sharing' with partner affiliates. The data processing gateway must be refactored to check for a distinct 'Data Sharing Consent Token'. If absent, a premium, user-friendly consent screen must block proceeding, explaining explicitly what data is shared and allowing selective opt-outs."
-        },
-        {
-          q: "Does this privacy directive conform with DPDP data minimization guidelines?",
-          a: "No, Clause 8.6 directly conflicts with data minimization principles by holding data for 365 days purely to ensure low-latency reactivation. The DPDP Act mandates that data must be deleted or anonymized as soon as the purpose of collection is no longer served."
-        }
-      ]
-    }
-  ];
-
-  const [activePreset, setActivePreset] = useState(presets[0]);
-
-  useEffect(() => {
-    if (chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [chatMessages, isTyping]);
-
-  // Scanning simulation steps
-  useEffect(() => {
-    if (currentView !== 'scanning') return;
-
-    if (scanStep < 5) {
-      const timer = setTimeout(() => {
-        setScanStep(prev => prev + 1);
-      }, 800);
-      return () => clearTimeout(timer);
-    } else {
-      setCurrentView('report');
-      setToast("Autonomous compliance sweep finished successfully.");
-    }
-  }, [currentView, scanStep]);
-
-  const handleFileDrop = (e) => {
-    e.preventDefault();
-<<<<<<< HEAD
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
-        setToast("Only .PDF files are supported for compliance scanning.");
-        return;
+        infractions: [
+          {
+            id: 'inf-1',
+            clause: "Clause 4.2 - Third-Party Integrations",
+            severity: "Critical",
+            infraction: "Silent User Consent Bypass for Partner Sharing",
+            standard: "Digital Personal Data Protection (DPDP) Act 2023 - Section 6",
+            description: "Sharing transaction records and profiles with secondary affiliates without active, granular, and prominent consent prompts violates fundamental privacy norms.",
+            mitigation: "Redesign the integration layers to block automatic sharing. Introduce an explicit, granular opt-in prompt clearly outlining what data points are shared, with whom, and for what purpose."
+          },
+          {
+            id: 'inf-2',
+            clause: "Clause 8.6 - Retention Protocols",
+            severity: "Warning",
+            infraction: "Excessive Active Retention Period for Inactive Accounts",
+            standard: "DPDP Act 2023 - Section 8 (Data Minimization & Deletion)",
+            description: "Retaining personal data for 365 days post-inactivity for 'low-latency reactivation' exceeds reasonable storage minimization limits.",
+            mitigation: "Reduce active cache retention to 180 days. Implement automated background pruning scripts to archive or anonymize records once the inactive status is triggered."
+          },
+          {
+            id: 'inf-3',
+            clause: "Clause 12.1 - Geographic Data Hosting",
+            severity: "Warning",
+            infraction: "Cross-Border Transfer of Analytical Metadata",
+            standard: "Sovereign Data Storage Mandate & IT Act Sec 43A",
+            description: "Relaying operational raw metadata to external jurisdictions without auditing certificates violates local sovereign storage provisions.",
+            mitigation: "Enforce strict geofencing policies inside your cloud infrastructure. Ensure all primary analytical steps and metadata caching occur within domestic server bounds."
+          }
+        ],
+        matrix: [
+          { item: "DPDP Act Section 6 (Consent)", status: "Non-Compliant", detail: "Critical violation in Clause 4.2 (Silent sharing)" },
+          { item: "DPDP Act Section 8 (Data Deletion)", status: "Partial Deficit", detail: "Retention exceeds limits in Clause 8.6" },
+          { item: "IT Act Sec 43A (Data Protection)", status: "Compliant", detail: "Robust TLS 1.3 encryption is active" },
+          { item: "Sovereign Data Localization Rules", status: "Partial Deficit", detail: "Analytical metadata relayed to external jurisdictions" },
+          { item: "MeitY Cybersecurity Rules 2022", status: "Compliant", detail: "Security logging matches sovereign specifications" }
+        ],
+        faq: [
+          {
+            q: "What are the major data sovereignty concerns in this document?",
+            a: "The principal sovereignty risk resides in Clause 12.1, which enables analytical user metadata and training weights to be relayed to external jurisdictions. Under the Sovereign Data Localization guidelines, raw analytical summaries of local citizens must be stored and processed within domestic borders unless specific regulatory exceptions are registered."
+          },
+          {
+            q: "How do we mitigate the Section 14 consent infraction?",
+            a: "To rectify the Clause 4.2 infraction, you must eliminate the clause granting 'silent data sharing' with partner affiliates. The data processing gateway must be refactored to check for a distinct 'Data Sharing Consent Token'. If absent, a premium, user-friendly consent screen must block proceeding, explaining explicitly what data is shared and allowing selective opt-outs."
+          },
+          {
+            q: "Does this privacy directive conform with DPDP data minimization guidelines?",
+            a: "No, Clause 8.6 directly conflicts with data minimization principles by holding data for 365 days purely to ensure low-latency reactivation. The DPDP Act mandates that data must be deleted or anonymized as soon as the purpose of collection is no longer served."
+          }
+        ]
       }
-      setToast("Document received for autonomous verification.");
-      const formattedSize = file.size > 1024 * 1024 
-        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` 
-        : `${(file.size / 1024).toFixed(1)} KB`;
-      setSelectedFile({ name: file.name, size: formattedSize });
-      setScanStep(0);
-      setCurrentView('scanning');
-    }
-  };
+    ];
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!file.name.toLowerCase().endsWith('.pdf')) {
-        setToast("Only .PDF files are supported for compliance scanning.");
-        return;
+    const [activePreset, setActivePreset] = useState(presets[0]);
+
+    useEffect(() => {
+      if (chatEndRef.current) {
+        chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
       }
-      setToast("Document received for autonomous verification.");
-      const formattedSize = file.size > 1024 * 1024 
-        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB` 
-        : `${(file.size / 1024).toFixed(1)} KB`;
-      setSelectedFile({ name: file.name, size: formattedSize });
-      setScanStep(0);
-      setCurrentView('scanning');
-    }
-  };
+    }, [chatMessages, isTyping]);
+
+    // Scanning simulation steps
+    useEffect(() => {
+      if (currentView !== 'scanning') return;
+
+      if (scanStep < 5) {
+        const timer = setTimeout(() => {
+          setScanStep(prev => prev + 1);
+        }, 800);
+        return () => clearTimeout(timer);
+      } else {
+        setCurrentView('report');
+        setToast("Autonomous compliance sweep finished successfully.");
+      }
+    }, [currentView, scanStep]);
+
+    const handleFileDrop = (e) => {
+      e.preventDefault();
+
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+          setToast("Only .PDF files are supported for compliance scanning.");
+          return;
+        }
+        setToast("Document received for autonomous verification.");
+        const formattedSize = file.size > 1024 * 1024
+          ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+          : `${(file.size / 1024).toFixed(1)} KB`;
+        setSelectedFile({ name: file.name, size: formattedSize });
+        setScanStep(0);
+        setCurrentView('scanning');
+      }
+    };
+
+    const handleFileSelect = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        if (!file.name.toLowerCase().endsWith('.pdf')) {
+          setToast("Only .PDF files are supported for compliance scanning.");
+          return;
+        }
+        setToast("Document received for autonomous verification.");
+        const formattedSize = file.size > 1024 * 1024
+          ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+          : `${(file.size / 1024).toFixed(1)} KB`;
+        setSelectedFile({ name: file.name, size: formattedSize });
+        setScanStep(0);
+        setCurrentView('scanning');
+      }
+    };
 
   const selectFileManual = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
-=======
-    setToast("Document received for autonomous verification.");
-    setSelectedFile({ name: "Uploaded_Policy_Charter.pdf", size: "1.2 MB" });
-    setScanStep(0);
-    setCurrentView('scanning');
-  };
-
-  const selectFileManual = () => {
-    setToast("Preset file loaded for autonomous audit.");
-    setSelectedFile({ name: presets[0].title, size: presets[0].size });
-    setScanStep(0);
-    setCurrentView('scanning');
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
   };
 
   const handleActionView = (actionType) => {
@@ -412,15 +341,15 @@ Analytical user metadata and training weights may be relayed to globally distrib
     setIsTyping(true);
 
     setTimeout(() => {
-      const matchedFaq = activePreset.faq.find(item => 
-        chatInput.toLowerCase().includes(item.q.toLowerCase()) || 
+      const matchedFaq = activePreset.faq.find(item =>
+        chatInput.toLowerCase().includes(item.q.toLowerCase()) ||
         item.q.toLowerCase().includes(chatInput.toLowerCase()) ||
         (chatInput.toLowerCase().includes('sovereign') && item.q.toLowerCase().includes('sovereignty')) ||
         (chatInput.toLowerCase().includes('consent') && item.q.toLowerCase().includes('consent'))
       );
 
       let responseText = `Regarding your query about "${chatInput}": I have run an active semantic match. In this document, we note potential compliance frictions. To ensure full alignment with sovereign frameworks, verify that all cloud endpoints are hosted within local datacenters and ensure that active user consent prompts are prompted explicitly prior to any external data propagation.`;
-      
+
       if (matchedFaq) {
         responseText = matchedFaq.a;
       }
@@ -441,32 +370,28 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
   return (
     <div className="flex h-screen w-full bg-[#f8f9fa] text-[#191c1d] font-sans antialiased overflow-hidden select-none">
-      
+
       {/* Toast Notification */}
       {toast && (
-<<<<<<< HEAD
         <div className="fixed bottom-6 right-6 z-50 bg-[#003262] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-white/10 animate-bounce">
-=======
-        <div className="fixed bottom-6 right-6 z-50 bg-[#000a1e] text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-white/10 animate-bounce">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
           <Sparkles className="text-yellow-400 h-4.5 w-4.5" />
           <span className="text-xs font-bold">{toast}</span>
         </div>
       )}
 
       {/* Left Sidebar Navigation - STITCH PERFECT DESIGN */}
-<<<<<<< HEAD
+
       <aside className={`relative bg-[#edeeef] flex flex-col border-r border-[#c4c6cf] z-30 transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-20' : 'w-72'}`}>
         {/* Brand Identity & Collapse Control */}
         <div className={`p-6 flex items-center transition-all duration-300 ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-          <button 
+          <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             className="p-1.5 text-[#44474e] hover:text-[#003262] rounded-lg hover:bg-[#e7e8e9] transition-colors flex-shrink-0 cursor-pointer"
             title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             <Menu className="h-5.5 w-5.5" />
           </button>
-          
+
           {!isSidebarCollapsed && (
             <>
               <div className="w-9 h-9 bg-[#003262] rounded-lg flex items-center justify-center text-white shadow-md flex-shrink-0">
@@ -479,17 +404,17 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
         {/* Navigation Items */}
         <nav className={`flex-1 px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar ${isSidebarCollapsed ? 'flex flex-col items-center' : ''}`}>
-          
-          <button 
+
+          <button
             onClick={() => { navigateToSidebar('agent'); setCurrentView('upload'); setSelectedFile(null); }}
             title={isSidebarCollapsed ? "Regulatory Monitoring Agent" : undefined}
             className={`w-full flex items-center transition-all duration-200 ${
-              isSidebarCollapsed 
-                ? "justify-center py-3 px-0 rounded-xl font-bold" 
+              isSidebarCollapsed
+                ? "justify-center py-3 px-0 rounded-xl font-bold"
                 : "gap-3 px-6 py-3 rounded-xl font-bold text-left"
             } ${
-              activeSidebar === 'agent' 
-                ? "text-[#003262] bg-gradient-to-r from-[#003262]/5 to-transparent border-l-4 border-[#FDB515]" 
+              activeSidebar === 'agent'
+                ? "text-[#003262] bg-gradient-to-r from-[#003262]/5 to-transparent border-l-4 border-[#FDB515]"
                 : "text-[#44474e] hover:bg-[#e7e8e9]"
             }`}
           >
@@ -497,16 +422,16 @@ Analytical user metadata and training weights may be relayed to globally distrib
             {!isSidebarCollapsed && <span className="text-sm">Regulatory Monitoring Agent</span>}
           </button>
 
-          <button 
+          <button
             onClick={() => { navigateToSidebar('map'); }}
             title={isSidebarCollapsed ? "Map Generator" : undefined}
             className={`w-full flex items-center transition-all duration-200 ${
-              isSidebarCollapsed 
-                ? "justify-center py-3 px-0 rounded-xl font-bold" 
+              isSidebarCollapsed
+                ? "justify-center py-3 px-0 rounded-xl font-bold"
                 : "gap-3 px-6 py-3 rounded-xl font-bold text-left"
             } ${
-              activeSidebar === 'map' 
-                ? "text-[#003262] bg-gradient-to-r from-[#003262]/5 to-transparent border-l-4 border-[#FDB515]" 
+              activeSidebar === 'map'
+                ? "text-[#003262] bg-gradient-to-r from-[#003262]/5 to-transparent border-l-4 border-[#FDB515]"
                 : "text-[#44474e] hover:bg-[#e7e8e9]"
             }`}
           >
@@ -516,25 +441,23 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
           {/* Expandable Section */}
           <div className="pt-2 w-full">
-            <button 
-              onClick={() => {
+            <button
+                onClick={() => {
                 navigateToSidebar('assignments');
-                setSelectedAssignmentTab('banking');
+                setSelectedAssignmentTab('main');
                 if (isSidebarCollapsed) {
                   setIsSidebarCollapsed(false);
-                  setAssignmentsExpanded(true);
-                } else {
-                  setAssignmentsExpanded(!assignmentsExpanded);
                 }
+                setAssignmentsExpanded(true);
               }}
               title={isSidebarCollapsed ? "Assignments" : undefined}
               className={`w-full flex items-center justify-between transition-all ${
-                isSidebarCollapsed 
-                  ? "justify-center py-3 px-0 rounded-xl font-bold" 
+                isSidebarCollapsed
+                  ? "justify-center py-3 px-0 rounded-xl font-bold"
                   : "px-6 py-3 rounded-xl font-bold"
               } ${
-                activeSidebar === 'assignments' 
-                  ? "text-[#003262] bg-gradient-to-r from-[#003262]/5 to-transparent border-l-4 border-[#FDB515]" 
+                activeSidebar === 'assignments'
+                  ? "text-[#003262] bg-gradient-to-r from-[#003262]/5 to-transparent border-l-4 border-[#FDB515]"
                   : "text-[#44474e] hover:bg-[#e7e8e9]"
               }`}
             >
@@ -547,8 +470,18 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
              {!isSidebarCollapsed && assignmentsExpanded && (
               <div className="ml-10 mt-1 space-y-1 border-l border-[#c4c6cf] pl-4 text-left">
-                <button 
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('banking'); setToast("Loading Customer Banking audits..."); }} 
+                <button
+                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('main'); setToast("Loading Main audits..."); }}
+                  className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
+                    activeSidebar === 'assignments' && selectedAssignmentTab === 'main'
+                      ? "text-[#003262] font-black"
+                      : "text-[#44474e] font-semibold hover:text-[#003262]"
+                  }`}
+                >
+                  Main
+                </button>
+                <button
+                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('banking'); setToast("Loading Customer Banking audits..."); }}
                   className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
                     activeSidebar === 'assignments' && selectedAssignmentTab === 'banking'
                       ? "text-[#003262] font-black"
@@ -557,8 +490,8 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 >
                   Customer Banking
                 </button>
-                <button 
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('finance'); setToast("Loading Loans & Finance audits..."); }} 
+                <button
+                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('finance'); setToast("Loading Loans & Finance audits..."); }}
                   className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
                     activeSidebar === 'assignments' && selectedAssignmentTab === 'finance'
                       ? "text-[#003262] font-black"
@@ -567,8 +500,8 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 >
                   Loans & Finance
                 </button>
-                <button 
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('security'); setToast("Loading Technology & Security audits..."); }} 
+                <button
+                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('security'); setToast("Loading Technology & Security audits..."); }}
                   className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
                     activeSidebar === 'assignments' && selectedAssignmentTab === 'security'
                       ? "text-[#003262] font-black"
@@ -577,8 +510,8 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 >
                   Technology & Security
                 </button>
-                <button 
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('support'); setToast("Loading Operation & Support audits..."); }} 
+                <button
+                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('support'); setToast("Loading Operation & Support audits..."); }}
                   className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
                     activeSidebar === 'assignments' && selectedAssignmentTab === 'support'
                       ? "text-[#003262] font-black"
@@ -587,140 +520,41 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 >
                   Operation & Support
                 </button>
-=======
-      <aside className="w-72 bg-[#edeeef] flex flex-col border-r border-[#c4c6cf] z-30">
-        
-        {/* Brand Identity */}
-        <div className="p-6 flex items-center gap-2">
-          <img 
-            alt="Ashoka Emblem" 
-            className="h-9 w-auto object-contain filter drop-shadow-sm" 
-            src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg"
-          />
-          <div className="w-9 h-9 bg-[#000a1e] rounded-lg flex items-center justify-center text-white shadow-md flex-shrink-0">
-            <Shield className="h-4.5 w-4.5 fill-current text-white" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-[#000a1e] font-public uppercase">AURIS</span>
-        </div>
-
-        {/* Navigation Items */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto custom-scrollbar">
-          
-          <button 
-            onClick={() => { setActiveSidebar('agent'); setCurrentView('upload'); setSelectedFile(null); }}
-            className={`w-full flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-200 text-left ${
-              activeSidebar === 'agent' 
-                ? "text-[#000a1e] bg-gradient-to-r from-[#000a1e]/5 to-transparent border-l-4 border-[#000a1e]" 
-                : "text-[#44474e] hover:bg-[#e7e8e9]"
-            }`}
-          >
-            <TrendingUp className="h-5 w-5" />
-            <span className="text-sm">Regulatory Monitoring Agent</span>
-          </button>
-
-          <button 
-            onClick={() => { setActiveSidebar('map'); }}
-            className={`w-full flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-200 text-left ${
-              activeSidebar === 'map' 
-                ? "text-[#000a1e] bg-gradient-to-r from-[#000a1e]/5 to-transparent border-l-4 border-[#000a1e]" 
-                : "text-[#44474e] hover:bg-[#e7e8e9]"
-            }`}
-          >
-            <Map className="h-5 w-5" />
-            <span className="text-sm">Map Generator</span>
-          </button>
-
-          {/* Expandable Section */}
-          <div className="pt-2">
-            <button 
-              onClick={() => setAssignmentsExpanded(!assignmentsExpanded)}
-              className="w-full flex items-center justify-between px-6 py-3 rounded-xl font-bold text-[#44474e] hover:bg-[#e7e8e9] transition-all"
-            >
-              <div className="flex items-center gap-3">
-                <ClipboardList className="h-5 w-5" />
-                <span className="text-sm">Assignments</span>
-              </div>
-              {assignmentsExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-            </button>
-
-            {assignmentsExpanded && (
-              <div className="ml-10 mt-1 space-y-1 border-l border-[#c4c6cf] pl-4 text-left">
-                <button onClick={() => setToast("Loading Customer Banking audits...")} className="block w-full text-left py-1.5 text-xs text-[#44474e] font-semibold hover:text-[#000a1e] hover:translate-x-1 transition-all">Customer Banking</button>
-                <button onClick={() => setToast("Loading Loans & Finance audits...")} className="block w-full text-left py-1.5 text-xs text-[#44474e] font-semibold hover:text-[#000a1e] hover:translate-x-1 transition-all">Loans & Finance</button>
-                <button onClick={() => setToast("Loading Technology & Security audits...")} className="block w-full text-left py-1.5 text-xs text-[#44474e] font-semibold hover:text-[#000a1e] hover:translate-x-1 transition-all">Technology & Security</button>
-                <button onClick={() => setToast("Loading Operation & Support audits...")} className="block w-full text-left py-1.5 text-xs text-[#44474e] font-semibold hover:text-[#000a1e] hover:translate-x-1 transition-all">Operation & Support</button>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
               </div>
             )}
           </div>
 
-          <button 
-<<<<<<< HEAD
+          <button
             onClick={() => { navigateToSidebar('validation'); }}
             title={isSidebarCollapsed ? "Validation" : undefined}
             className={`w-full flex items-center transition-all duration-200 ${
-              isSidebarCollapsed 
-                ? "justify-center py-3 px-0 rounded-xl font-bold" 
+              isSidebarCollapsed
+                ? "justify-center py-3 px-0 rounded-xl font-bold"
                 : "gap-3 px-6 py-3 rounded-xl font-bold text-left"
             } ${
-              activeSidebar === 'validation' 
-                ? "text-[#003262] bg-gradient-to-r from-[#003262]/5 to-transparent border-l-4 border-[#FDB515]" 
+              activeSidebar === 'validation'
+                ? "text-[#003262] bg-gradient-to-r from-[#003262]/5 to-transparent border-l-4 border-[#FDB515]"
                 : "text-[#44474e] hover:bg-[#e7e8e9]"
             }`}
           >
             <ShieldCheck className="h-5 w-5 flex-shrink-0" />
             {!isSidebarCollapsed && <span className="text-sm">Validation</span>}
-=======
-            onClick={() => setActiveSidebar('validation')}
-            className={`w-full flex items-center gap-3 px-6 py-3 rounded-xl font-bold transition-all duration-200 text-left ${
-              activeSidebar === 'validation' 
-                ? "text-[#000a1e] bg-gradient-to-r from-[#000a1e]/5 to-transparent border-l-4 border-[#000a1e]" 
-                : "text-[#44474e] hover:bg-[#e7e8e9]"
-            }`}
-          >
-            <ShieldCheck className="h-5 w-5" />
-            <span className="text-sm">Validation</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </button>
 
         </nav>
 
-<<<<<<< HEAD
-
-=======
-        {/* Bottom Profile Info */}
-        <div className="p-6 border-t border-[#c4c6cf] bg-[#f3f4f5] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#82cfff]/30 text-[#001e2d] flex items-center justify-center font-bold">
-              SA
-            </div>
-            <div className="text-left">
-              <p className="text-sm font-bold text-[#000a1e] leading-none">System Admin</p>
-              <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#44474e] mt-1">Active Oversight</p>
-            </div>
-          </div>
-          
-          <button 
-            onClick={() => onNavigate('login')}
-            title="Sign Out"
-            className="p-1.5 text-slate-500 hover:text-rose-600 rounded-lg hover:bg-slate-200/50 transition-colors"
-          >
-            <LogoutIcon className="h-4.5 w-4.5" />
-          </button>
-        </div>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
       </aside>
 
       {/* Main Panel Content Area */}
       <main className="flex-grow flex flex-col relative overflow-hidden bg-[#f8f9fa]">
-        
+
         {/* Top Navbar */}
-<<<<<<< HEAD
+
         <header className="relative z-40 w-full px-12 py-3 flex justify-between items-center bg-[#f8f9fa]/85 backdrop-blur-md border-b border-[#c4c6cf] shadow-[0_2px_12px_-5px_rgba(0,0,0,0.05)] transition-all duration-300">
-          
+
           {/* Left panel oversight spacing placeholder */}
-          <button 
-            onClick={handleBack} 
+          <button
+            onClick={handleBack}
             className="flex items-center gap-2 px-4 py-2 bg-white border border-[#c4c6cf] text-[#003262] font-black text-xs uppercase tracking-wider rounded-xl shadow-sm hover:bg-[#003262] hover:text-white hover:border-[#003262] hover:shadow-md transition-all duration-300 cursor-pointer active:scale-95 group focus:outline-none"
             title={currentLanguage === 'hi' ? 'पिछले स्क्रीन पर वापस जाएं' : 'Go back to previous screen'}
           >
@@ -730,10 +564,10 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
           {/* Interactive Right Control Group */}
           <div className="flex items-center gap-5">
-            
+
             {/* Language Switch Segmented Button Toggle */}
             <div className="flex items-center bg-slate-200/50 p-0.5 rounded-xl border border-slate-300/40 shadow-inner">
-              <button 
+              <button
                 onClick={() => {
                   setCurrentLanguage('en');
                   setToast("Language switched to English");
@@ -742,7 +576,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
               >
                 EN
               </button>
-              <button 
+              <button
                 onClick={() => {
                   setCurrentLanguage('hi');
                   setToast("भाषा बदलकर हिंदी कर दी गई है");
@@ -762,7 +596,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
             </span>
 
             {/* Settings Trigger Icon */}
-            <button 
+            <button
               onClick={() => alert(currentLanguage === 'hi' ? "सामान्य ओवरसाइट सेटिंग्स लोड हो रही हैं..." : "Opening general oversight parameters...")}
               className="text-slate-500 hover:text-slate-900 hover:rotate-45 p-1 rounded-lg hover:bg-slate-200/50 transition-all duration-300 cursor-pointer"
               title={currentLanguage === 'hi' ? "सेटिंग्स" : "Settings"}
@@ -782,8 +616,8 @@ Analytical user metadata and training weights may be relayed to globally distrib
               {profileMenuOpen && (
                 <>
                   {/* Backdrop Click Shield to Close */}
-                  <div 
-                    className="fixed inset-0 z-40 bg-transparent" 
+                  <div
+                    className="fixed inset-0 z-40 bg-transparent"
                     onClick={() => setProfileMenuOpen(false)}
                   ></div>
 
@@ -819,42 +653,20 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 </>
               )}
             </div>
-
-=======
-        <header className="relative z-10 w-full px-12 py-3 flex justify-between items-center bg-[#f8f9fa]/80 backdrop-blur-md border-b border-[#c4c6cf]">
-          <div className="flex items-center gap-2 text-[#44474e] font-bold text-xs">
-            <Scale className="h-4 w-4" />
-            <span>Intelligence Oversight Panel</span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-              <span className="text-[9px] font-bold uppercase tracking-widest">Network Secure</span>
-            </span>
-
-            <button 
-              onClick={() => alert("Opening general oversight parameters...")}
-              className="text-[#44474e] hover:text-[#000a1e] transition-colors"
-            >
-              <Settings className="h-4.5 w-4.5" />
-            </button>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </div>
         </header>
 
         {/* Switch Views Based on Active Sidebar Link */}
         {activeSidebar === 'agent' && (
-<<<<<<< HEAD
           <div className="flex-grow flex flex-col relative overflow-y-auto custom-scrollbar h-full">
-=======
+
           <div className="flex-grow flex flex-col relative">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
-            
+
+
             {/* Background image map overlay (exactly matching screenshot specs) */}
             <div className="absolute inset-0 z-0 opacity-[0.04] pointer-events-none">
-              <img 
-                className="w-full h-full object-cover grayscale brightness-50" 
+              <img
+                className="w-full h-full object-cover grayscale brightness-50"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhSOT0Czd6f4T_dXO6GKmtryah04mxLYTQqqQq0Ndyh8vigDZi9VDa3mg9bJ6CnAJiZ28nzMxXAlO3Qe_wkjNDm3kqd5kuU_NaNmfdoYh3ZsBkGeNJL3UsRga2IQmS1RYnjAMWBrw3U4m_5b0aY3CuZdP1zvQwe2-AIwOUNaNFfXMv-1oehpjHjJoQbyqyNegbXjL0TcXNbrWAcsh-QmA0Seqqov7_MvYq80Gv4Tn5bAK7W-T4rdeeXzJpRT0QErmyzpevMfHUMUo"
                 alt="Government Building Backdrop"
               />
@@ -862,49 +674,48 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
             {/* STITCH UPLOAD SCREEN STATE (Matches your screenshot exactly!) */}
             {currentView === 'upload' && (
-<<<<<<< HEAD
-              <div className="relative z-10 flex-grow flex flex-col items-start justify-start px-12 py-10 w-full space-y-10">
-                
+              <div className="relative z-10 flex-grow flex flex-col items-start justify-start px-12 py-10 w-full space-y-10 min-h-[calc(100vh-80px)]">
+
                 {/* Titles */}
                 <div className="text-left space-y-3.5 w-full">
                   <h1 className="text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-none font-public">
                     {currentLanguage === 'hi' ? 'नियामक निगरानी एजेंट' : 'Regulatory Monitoring Agent'}
                   </h1>
                   <p className="text-slate-600 text-sm md:text-[15px] font-semibold leading-relaxed max-w-3xl">
-                    {currentLanguage === 'hi' 
-                      ? 'स्वायत्त जोखिम मूल्यांकन और कानूनी संरेखण सत्यापन के लिए संप्रभु नीति दस्तावेज या आंतरिक निर्देश अपलोड करें।' 
+                    {currentLanguage === 'hi'
+                      ? 'स्वायत्त जोखिम मूल्यांकन और कानूनी संरेखण सत्यापन के लिए संप्रभु नीति दस्तावेज या आंतरिक निर्देश अपलोड करें।'
                       : 'Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.'}
                   </p>
                 </div>
 
                 {/* Center Content Wrapper */}
                 <div className="w-full flex flex-col items-center justify-center space-y-10">
-                  
+
                   {/* PDF Upload Box (STITCH EXACT DETAILS) */}
-                  <div 
+                  <div
                     id="drop-zone"
                     onDragOver={(e) => { e.preventDefault(); }}
                     onDrop={handleFileDrop}
                     onClick={selectFileManual}
                     className="w-full max-w-3xl bg-white py-20 px-12 min-h-[380px] rounded-2xl flex flex-col items-center justify-center gap-6 cursor-pointer border-2 border-dashed border-[#c4c6cf] hover:border-[#003262] hover:bg-[#edeeef]/40 transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] shadow-sm group"
                   >
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      onChange={handleFileSelect} 
-                      accept=".pdf" 
-                      className="hidden" 
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileSelect}
+                      accept=".pdf"
+                      className="hidden"
                     />
                     <div className="w-20 h-20 bg-[rgba(188, 155, 106, 0.2)] rounded-full flex items-center justify-center text-[#003262] transition-transform group-hover:scale-105 duration-300 shadow-inner">
                       <FileText className="h-10 w-10 text-[#003262]" />
                     </div>
-                    
+
                     <div className="text-center space-y-1">
                       <h3 className="text-lg font-bold text-[#003262]">Drag &amp; Drop Documents</h3>
                       <p className="text-xs font-semibold text-[#44474e]">Limit 50MB per file. Supported format: .PDF only.</p>
                     </div>
-                    
-                    <button 
+
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         selectFileManual();
@@ -917,77 +728,22 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                   {/* Lower Action buttons */}
                   <div className="flex flex-wrap justify-center gap-6 w-full max-w-3xl">
-                    <button 
+                    <button
+                      onClick={() => handleActionView('Direct Compliance Analysis')}
                       className="flex items-center gap-3 px-8 py-4 bg-[#003262] border-2 border-[#003262] hover:bg-[#004b87] hover:border-[#004b87] text-white font-extrabold text-sm tracking-wide rounded-xl shadow-md hover:shadow-lg transition-all duration-300 active:scale-[0.98] w-72 justify-center cursor-pointer"
                     >
                       <Eye className="h-5 w-5 text-white" />
                       View Result
                     </button>
-                    <button 
+                    <button
+                      onClick={() => handleActionView('Legal Interpretation Framework')}
                       className="flex items-center gap-3 px-8 py-4 bg-[#003262] border-2 border-[#003262] hover:bg-[#004b87] hover:border-[#004b87] text-white font-extrabold text-sm tracking-wide rounded-xl shadow-md hover:shadow-lg transition-all duration-300 active:scale-[0.98] w-72 justify-center cursor-pointer"
                     >
                       <Scale className="h-5 w-5 text-white" />
                       View Legal Interpretation
                     </button>
                   </div>
-
-=======
-              <div className="relative z-10 flex-grow flex flex-col items-center justify-center px-6 py-12 max-w-4xl mx-auto w-full space-y-10">
-                
-                {/* Titles */}
-                <div className="text-center space-y-3.5">
-                  <span className="text-[#00658d] font-bold text-xs tracking-[0.2em] uppercase block">
-                    Autonomous Unified Risk Intelligence System
-                  </span>
-                  <h1 className="text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-none font-public">
-                    Regulatory Monitoring Agent
-                  </h1>
-                  <p className="text-slate-600 text-sm md:text-[15px] font-semibold leading-relaxed max-w-3xl mx-auto">
-                    Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.
-                  </p>
                 </div>
-
-                {/* PDF Upload Box (STITCH EXACT DETAILS) */}
-                <div 
-                  id="drop-zone"
-                  onDragOver={(e) => { e.preventDefault(); }}
-                  onDrop={handleFileDrop}
-                  onClick={selectFileManual}
-                  className="w-full max-w-3xl bg-white py-20 px-12 min-h-[380px] rounded-2xl flex flex-col items-center justify-center gap-6 cursor-pointer border-2 border-dashed border-[#c4c6cf] hover:border-[#000a1e] hover:bg-[#edeeef]/40 transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] shadow-sm group"
-                >
-                  <div className="w-20 h-20 bg-[#d6e3ff] rounded-full flex items-center justify-center text-[#000a1e] transition-transform group-hover:scale-105 duration-300 shadow-inner">
-                    <FileText className="h-10 w-10 text-[#000a1e]" />
-                  </div>
-                  
-                  <div className="text-center space-y-1">
-                    <h3 className="text-lg font-bold text-[#000a1e]">Drag &amp; Drop Documents</h3>
-                    <p className="text-xs font-semibold text-[#44474e]">Limit 50MB per file. Supported format: .PDF only.</p>
-                  </div>
-                  
-                  <button className="px-6 py-2.5 bg-[#000a1e] hover:bg-[#000a1e]/90 text-white text-xs font-bold rounded-lg hover:shadow-md transition-all">
-                    Browse Files
-                  </button>
-                </div>
-
-                {/* Lower Action buttons */}
-                <div className="flex flex-wrap justify-center gap-6 w-full max-w-2xl">
-                  <button 
-                    onClick={() => handleActionView('Direct Compliance Analysis')}
-                    className="flex items-center gap-2.5 px-8 py-3.5 bg-[#000a1e] hover:bg-[#000a1e]/90 text-white font-bold text-xs rounded-lg hover:shadow-md transition-all active:scale-95 w-64 justify-center"
-                  >
-                    <Eye className="h-4.5 w-4.5" />
-                    View Result
-                  </button>
-                  <button 
-                    onClick={() => handleActionView('Legal Interpretation Framework')}
-                    className="flex items-center gap-2.5 px-8 py-3.5 bg-white border-2 border-[#000a1e] text-[#000a1e] font-bold text-xs rounded-lg hover:bg-[#d6e3ff]/40 transition-all active:scale-95 w-64 justify-center"
-                  >
-                    <Scale className="h-4.5 w-4.5" />
-                    View Legal Interpretation
-                  </button>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
-                </div>
-
               </div>
             )}
 
@@ -995,7 +751,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
             {currentView === 'scanning' && (
               <div className="relative z-10 flex-grow flex items-center justify-center p-6">
                 <div className="max-w-md w-full bg-white border border-[#c4c6cf] rounded-2xl p-8 shadow-md text-center space-y-6">
-                  
+
                   <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
                     <div className="absolute inset-0 rounded-full border-4 border-slate-100"></div>
                     <div className="absolute inset-0 rounded-full border-4 border-[#00658d] border-t-transparent animate-spin"></div>
@@ -1003,11 +759,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
                   </div>
 
                   <div className="space-y-1">
-<<<<<<< HEAD
                     <h3 className="text-lg font-bold text-[#003262]">Autonomous Compliance Scan Active</h3>
-=======
-                    <h3 className="text-lg font-bold text-[#000a1e]">Autonomous Compliance Scan Active</h3>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     <p className="text-xs text-[#44474e] font-semibold">Running regulatory auditing protocols on "{selectedFile?.name}"...</p>
                   </div>
 
@@ -1050,57 +802,34 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
             {/* GORGEOUS COMPLIANCE ANALYSIS REPORT SCREEN */}
             {currentView === 'report' && (
-<<<<<<< HEAD
-              <div className="relative z-10 flex-grow p-8 max-w-7xl w-full mx-auto space-y-6">
-=======
-              <div className="relative z-10 flex-grow overflow-y-auto p-8 max-w-7xl w-full mx-auto space-y-6 custom-scrollbar">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
-                
+              <div className="relative z-10 flex-grow overflow-y-auto p-8 max-w-7xl w-full mx-auto space-y-6 custom-scrollbar min-h-[calc(100vh-80px)]">
+
                 {/* Back to upload and audit details panel */}
                 <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm text-left">
                   <div className="flex items-center gap-3">
-<<<<<<< HEAD
-                    <div className="p-2 bg-[rgba(188, 155, 106, 0.2)] text-[#003262] rounded-xl">
-=======
-                    <div className="p-2 bg-[#d6e3ff] text-[#000a1e] rounded-xl">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
+                    <div className="p-2 bg-[rgba(188,155,106,0.2)] text-[#003262] rounded-xl">
                       <FileCheck className="h-5 w-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-<<<<<<< HEAD
                         <span className="font-bold text-sm text-[#003262]">{selectedFile?.name}</span>
                         <span className="text-[11px] font-extrabold bg-[#82cfff]/20 text-[#001e2d] px-2 py-0.5 rounded uppercase">Verified Report</span>
                       </div>
                       <p className="text-[11px] text-[#44474e] font-semibold">Audit SHA-256 Hash ID: AURIS-SHA-77A912F</p>
-=======
-                        <span className="font-bold text-sm text-[#000a1e]">{selectedFile?.name}</span>
-                        <span className="text-[10px] font-extrabold bg-[#82cfff]/20 text-[#001e2d] px-2 py-0.5 rounded uppercase">Verified Report</span>
-                      </div>
-                      <p className="text-[10px] text-[#44474e] font-semibold">Audit SHA-256 Hash ID: AURIS-SHA-77A912F</p>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button 
+                    <button
                       onClick={() => { setScanStep(0); setCurrentView('scanning'); }}
-<<<<<<< HEAD
                       className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 text-[#44474e] font-bold text-[12px] rounded-xl flex items-center gap-1 transition-all"
-=======
-                      className="px-3.5 py-1.5 border border-slate-200 hover:bg-slate-50 text-[#44474e] font-bold text-[11px] rounded-xl flex items-center gap-1 transition-all"
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     >
                       <RefreshCw className="h-3 w-3" />
                       Recalculate
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setSelectedFile(null); setCurrentView('upload'); }}
-<<<<<<< HEAD
                       className="px-3.5 py-1.5 bg-[#003262] text-white font-bold text-[12px] rounded-xl hover:shadow-md transition-all"
-=======
-                      className="px-3.5 py-1.5 bg-[#000a1e] text-white font-bold text-[11px] rounded-xl hover:shadow-md transition-all"
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     >
                       New Audit
                     </button>
@@ -1109,124 +838,81 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                 {/* Score Widget Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
-                  
+
                   {/* Gauge score card */}
                   <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 shadow-sm flex flex-col items-center justify-between min-h-[150px]">
-<<<<<<< HEAD
                     <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Compliance Index</span>
-=======
-                    <span className="text-[10px] font-extrabold text-[#44474e] uppercase tracking-wider">Compliance Index</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
-                    
                     <div className="relative w-16 h-16 flex items-center justify-center my-2">
                       <svg className="w-16 h-16 transform -rotate-90">
                         <circle cx="32" cy="32" r="28" className="stroke-slate-100 stroke-4 fill-none" />
-                        <circle 
-                          cx="32" 
-                          cy="32" 
-                          r="28" 
+                        <circle
+                          cx="32"
+                          cy="32"
+                          r="28"
                           className="stroke-4 fill-none stroke-[#00658d]"
                           strokeDasharray={176}
                           strokeDashoffset={176 - (176 * activePreset.complianceScore) / 100}
                           strokeLinecap="round"
                         />
                       </svg>
-<<<<<<< HEAD
                       <span className="absolute text-base font-black text-[#003262]">{activePreset.complianceScore}%</span>
                     </div>
-
                     <span className="text-[11px] font-bold uppercase bg-emerald-50 text-emerald-800 px-3 py-0.5 rounded-full">{activePreset.status}</span>
-=======
-                      <span className="absolute text-base font-black text-[#000a1e]">{activePreset.complianceScore}%</span>
-                    </div>
-
-                    <span className="text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 px-3 py-0.5 rounded-full">{activePreset.status}</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   </div>
 
                   {/* Risks Found */}
                   <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 shadow-sm flex flex-col items-center justify-between min-h-[150px]">
-<<<<<<< HEAD
                     <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Risks Detected</span>
                     <span className="text-3xl font-black text-rose-600 my-auto">{activePreset.infractionsCount}</span>
                     <span className="text-[11px] text-rose-600 font-bold uppercase flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" />Action Demanded</span>
-=======
-                    <span className="text-[10px] font-extrabold text-[#44474e] uppercase tracking-wider">Risks Detected</span>
-                    <span className="text-3xl font-black text-rose-600 my-auto">{activePreset.infractionsCount}</span>
-                    <span className="text-[10px] text-rose-600 font-bold uppercase flex items-center gap-1"><AlertTriangle className="h-3.5 w-3.5" />Action Demanded</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   </div>
 
                   {/* Critical Issues */}
                   <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 shadow-sm flex flex-col items-center justify-between min-h-[150px]">
-<<<<<<< HEAD
                     <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Critical Mismatch</span>
                     <span className="text-3xl font-black text-rose-800 my-auto">{activePreset.risks.critical}</span>
                     <span className="text-[11px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded">High Severity</span>
-=======
-                    <span className="text-[10px] font-extrabold text-[#44474e] uppercase tracking-wider">Critical Mismatch</span>
-                    <span className="text-3xl font-black text-rose-800 my-auto">{activePreset.risks.critical}</span>
-                    <span className="text-[10px] bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded">High Severity</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   </div>
 
                   {/* Warnings */}
                   <div className="bg-white border border-[#c4c6cf] rounded-2xl p-4 shadow-sm flex flex-col items-center justify-between min-h-[150px]">
-<<<<<<< HEAD
-                    <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Friction Warnings</span>
+                    <span className="text-[11px] font-extrabold text-[#44474e] uppercase tracking-wider">Warnings Issued</span>
                     <span className="text-3xl font-black text-amber-600 my-auto">{activePreset.risks.warning}</span>
                     <span className="text-[11px] bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded">Moderate Level</span>
-=======
-                    <span className="text-[10px] font-extrabold text-[#44474e] uppercase tracking-wider">Friction Warnings</span>
-                    <span className="text-3xl font-black text-amber-600 my-auto">{activePreset.risks.warning}</span>
-                    <span className="text-[10px] bg-amber-50 text-amber-800 font-bold px-2 py-0.5 rounded">Moderate Level</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                   </div>
 
                 </div>
 
                 {/* Split content grids: tabs and AI legal chatbot */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch text-left">
-                  
+
                   {/* Left part: report details */}
                   <div className="lg:col-span-8 bg-white border border-[#c4c6cf] rounded-2xl overflow-hidden shadow-sm flex flex-col">
-                    
+
                     {/* Tabs */}
                     <div className="bg-slate-50 border-b border-slate-200 flex text-xs font-bold text-[#44474e]">
-                      <button 
+                      <button
                         onClick={() => setActiveTab('infractions')}
                         className={`py-3 px-5 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
-<<<<<<< HEAD
                           activeTab === 'infractions' ? "border-[#FDB515] text-[#003262] bg-white font-bold" : "border-transparent hover:text-slate-900"
-=======
-                          activeTab === 'infractions' ? "border-[#000a1e] text-[#000a1e] bg-white font-bold" : "border-transparent hover:text-slate-900"
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         }`}
                       >
                         <AlertTriangle className="h-4 w-4" />
                         Infractions Map
                       </button>
-                      <button 
+                      <button
                         onClick={() => setActiveTab('matrix')}
                         className={`py-3 px-5 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
-<<<<<<< HEAD
                           activeTab === 'matrix' ? "border-[#FDB515] text-[#003262] bg-white font-bold" : "border-transparent hover:text-slate-900"
-=======
-                          activeTab === 'matrix' ? "border-[#000a1e] text-[#000a1e] bg-white font-bold" : "border-transparent hover:text-slate-900"
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         }`}
                       >
                         <ShieldCheck className="h-4 w-4" />
                         Alignment Map
                       </button>
-                      <button 
+                      <button
                         onClick={() => setActiveTab('draft')}
                         className={`py-3 px-5 border-b-2 transition-all flex items-center gap-1.5 cursor-pointer ${
-<<<<<<< HEAD
                           activeTab === 'draft' ? "border-[#FDB515] text-[#003262] bg-white font-bold" : "border-transparent hover:text-slate-900"
-=======
-                          activeTab === 'draft' ? "border-[#000a1e] text-[#000a1e] bg-white font-bold" : "border-transparent hover:text-slate-900"
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         }`}
                       >
                         <FileText className="h-4 w-4" />
@@ -1236,43 +922,27 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                     {/* Tab panels */}
                     <div className="p-6 flex-grow">
-                      
+
                       {activeTab === 'infractions' && (
                         <div className="space-y-4">
-<<<<<<< HEAD
                           <h3 className="text-sm font-bold text-[#003262]">Identified Non-Compliant Clauses</h3>
-=======
-                          <h3 className="text-sm font-bold text-[#000a1e]">Identified Non-Compliant Clauses</h3>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
-                          
+
                           <div className="space-y-3">
                             {activePreset.infractions.map((inf) => (
                               <div key={inf.id} className="border border-slate-200 rounded-xl overflow-hidden text-xs">
                                 <div className="bg-slate-50 p-3 flex justify-between items-center border-b border-slate-200">
-<<<<<<< HEAD
                                   <span className={`text-[11px] font-extrabold uppercase px-2 py-0.5 rounded ${
-=======
-                                  <span className={`text-[9px] font-extrabold uppercase px-2 py-0.5 rounded ${
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                                     inf.severity === "Critical" ? "bg-rose-50 text-rose-700" : "bg-amber-50 text-amber-700"
                                   }`}>{inf.severity}</span>
                                   <span className="font-bold text-slate-800">{inf.clause}</span>
                                 </div>
                                 <div className="p-4 space-y-3">
                                   <p className="font-semibold text-rose-950 bg-rose-500/10 p-2.5 rounded border border-rose-500/10 leading-relaxed">
-<<<<<<< HEAD
                                     <span className="font-extrabold block text-[11px] text-rose-800 uppercase tracking-wider mb-0.5">Found Infraction</span>
                                     {inf.infraction} ({inf.standard})
                                   </p>
                                   <p className="text-slate-600 font-medium leading-relaxed bg-emerald-500/5 p-2.5 rounded border border-emerald-500/5">
                                     <span className="font-extrabold block text-[11px] text-emerald-800 uppercase tracking-wider mb-0.5">AI Mitigating Directive</span>
-=======
-                                    <span className="font-extrabold block text-[9.5px] text-rose-800 uppercase tracking-wider mb-0.5">Found Infraction</span>
-                                    {inf.infraction} ({inf.standard})
-                                  </p>
-                                  <p className="text-slate-600 font-medium leading-relaxed bg-emerald-500/5 p-2.5 rounded border border-emerald-500/5">
-                                    <span className="font-extrabold block text-[9.5px] text-emerald-800 uppercase tracking-wider mb-0.5">AI Mitigating Directive</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                                     {inf.mitigation}
                                   </p>
                                 </div>
@@ -1284,11 +954,8 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                       {activeTab === 'matrix' && (
                         <div className="space-y-4">
-<<<<<<< HEAD
                           <h3 className="text-sm font-bold text-[#003262]">Sovereign Statute Compatibility Report</h3>
-=======
-                          <h3 className="text-sm font-bold text-[#000a1e]">Sovereign Statute Compatibility Report</h3>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
+
                           <div className="border border-slate-200 rounded-xl overflow-hidden">
                             <table className="w-full text-xs">
                               <thead>
@@ -1303,21 +970,13 @@ Analytical user metadata and training weights may be relayed to globally distrib
                                   <tr key={idx} className="hover:bg-slate-50/50">
                                     <td className="py-3 px-4 font-bold text-slate-900">{row.item}</td>
                                     <td className="py-3 px-4">
-<<<<<<< HEAD
                                       <span className={`text-[10.5px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
-=======
-                                      <span className={`text-[8.5px] font-extrabold uppercase px-2 py-0.5 rounded-full ${
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                                         row.status === "Compliant" ? "bg-emerald-50 text-emerald-700" :
                                         row.status === "Partial Deficit" ? "bg-amber-50 text-amber-700" :
                                         "bg-rose-50 text-rose-700"
                                       }`}>{row.status}</span>
                                     </td>
-<<<<<<< HEAD
-                                    <td className="py-3 px-4 text-xs leading-relaxed text-slate-500">{row.detail}</td>
-=======
                                     <td className="py-3 px-4 text-[11px] leading-relaxed text-slate-500">{row.detail}</td>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                                   </tr>
                                 ))}
                               </tbody>
@@ -1328,13 +987,8 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                       {activeTab === 'draft' && (
                         <div className="space-y-3">
-<<<<<<< HEAD
                           <h3 className="text-sm font-bold text-[#003262]">Parsed Regulatory Policy Text</h3>
                           <div className="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-[12px] leading-relaxed max-h-[250px] overflow-y-auto custom-scrollbar">
-=======
-                          <h3 className="text-sm font-bold text-[#000a1e]">Parsed Regulatory Policy Text</h3>
-                          <div className="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-[10px] leading-relaxed max-h-[250px] overflow-y-auto custom-scrollbar">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                             <pre className="whitespace-pre-wrap">{activePreset.text}</pre>
                           </div>
                         </div>
@@ -1345,9 +999,8 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                   {/* Right part: AI Copilot Chat */}
                   <div className="lg:col-span-4 bg-white border border-[#c4c6cf] rounded-2xl shadow-sm overflow-hidden flex flex-col min-h-[480px]">
-                    
+
                     {/* Chat Header */}
-<<<<<<< HEAD
                     <div className="bg-[#003262] text-white p-4 flex items-center justify-between border-b border-slate-800">
                       <div className="flex items-center gap-2">
                         <div className="h-8 w-8 bg-[rgba(188, 155, 106, 0.2)] rounded-lg flex items-center justify-center text-[#003262] relative">
@@ -1357,17 +1010,6 @@ Analytical user metadata and training weights may be relayed to globally distrib
                         <div className="text-left leading-none">
                           <h4 className="text-xs font-bold uppercase tracking-wider">AURIS Copilot</h4>
                           <span className="text-[10.5px] text-emerald-400 font-extrabold uppercase mt-0.5 block">Audit Active</span>
-=======
-                    <div className="bg-[#000a1e] text-white p-4 flex items-center justify-between border-b border-slate-800">
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 bg-[#d6e3ff] rounded-lg flex items-center justify-center text-[#000a1e] relative">
-                          <Sparkles className="h-4.5 w-4.5" />
-                          <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-400 border border-[#000a1e]"></span>
-                        </div>
-                        <div className="text-left leading-none">
-                          <h4 className="text-[11px] font-bold uppercase tracking-wider">AURIS Copilot</h4>
-                          <span className="text-[8px] text-emerald-400 font-extrabold uppercase mt-0.5 block">Audit Active</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         </div>
                       </div>
                     </div>
@@ -1375,7 +1017,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
                     {/* Chat messages */}
                     <div className="flex-grow p-4 overflow-y-auto space-y-3 custom-scrollbar bg-slate-50/50 text-xs leading-relaxed flex flex-col">
                       {chatMessages.map((msg) => (
-                        <div 
+                        <div
                           key={msg.id}
                           className={`max-w-[85%] rounded-xl p-3 shadow-sm ${
                             msg.sender === 'user'
@@ -1384,11 +1026,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
                           }`}
                         >
                           <p>{msg.text}</p>
-<<<<<<< HEAD
                           <span className="text-[9.5px] opacity-75 mt-1 block text-right font-bold">{msg.timestamp}</span>
-=======
-                          <span className="text-[7.5px] opacity-75 mt-1 block text-right font-bold">{msg.timestamp}</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         </div>
                       ))}
 
@@ -1404,36 +1042,23 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
                     {/* Suggestions chips */}
                     <div className="p-3 bg-white border-t border-slate-100 text-left space-y-1.5">
-<<<<<<< HEAD
                       <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-widest block">Inquire details</span>
                       <div className="flex flex-col gap-1">
                         <button onClick={() => handleChipClick("What are the major data sovereignty concerns in this document?")} className="text-[11px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg py-1 px-2 text-left transition-colors">Analyze data sovereignty</button>
                         <button onClick={() => handleChipClick("How do we mitigate the Section 14 consent infraction?")} className="text-[11px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg py-1 px-2 text-left transition-colors">Mitigate consent infraction</button>
-=======
-                      <span className="text-[8px] font-extrabold text-slate-400 uppercase tracking-widest block">Inquire details</span>
-                      <div className="flex flex-col gap-1">
-                        <button onClick={() => handleChipClick("What are the major data sovereignty concerns in this document?")} className="text-[9px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg py-1 px-2 text-left transition-colors">Analyze data sovereignty</button>
-                        <button onClick={() => handleChipClick("How do we mitigate the Section 14 consent infraction?")} className="text-[9px] font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg py-1 px-2 text-left transition-colors">Mitigate consent infraction</button>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                       </div>
                     </div>
 
                     {/* Input */}
                     <form onSubmit={handleSendChat} className="p-3 bg-slate-50 border-t border-slate-200 flex gap-2">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
                         placeholder="Inquire policy issues..."
-<<<<<<< HEAD
                         className="flex-grow bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs outline-none focus:border-[#003262] placeholder-slate-400"
                       />
                       <button type="submit" className="bg-[#003262] text-white p-2 rounded-lg hover:shadow transition-all active:scale-95 flex items-center justify-center">
-=======
-                        className="flex-grow bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs outline-none focus:border-[#000a1e] placeholder-slate-400"
-                      />
-                      <button type="submit" className="bg-[#000a1e] text-white p-2 rounded-lg hover:shadow transition-all active:scale-95 flex items-center justify-center">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                         <Send className="h-3.5 w-3.5" />
                       </button>
                     </form>
@@ -1445,7 +1070,6 @@ Analytical user metadata and training weights may be relayed to globally distrib
               </div>
             )}
 
-<<<<<<< HEAD
             {/* The beautiful landing page footer! */}
             {currentView !== 'scanning' && (
               <footer className="w-full bg-slate-900 text-white py-12 border-t-4 border-orange-500 mt-12 z-20 text-center">
@@ -1483,115 +1107,80 @@ Analytical user metadata and training weights may be relayed to globally distrib
               </footer>
             )}
 
-=======
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </div>
-        )}
+        </div>
+      )}
 
         {/* Map Generator view */}
         {activeSidebar === 'map' && (
-<<<<<<< HEAD
           <div className="relative z-10 flex-grow flex flex-col w-full h-full overflow-y-auto custom-scrollbar">
-            
-            <div className="flex-grow flex flex-col items-start justify-start p-6 md:px-12 md:py-6 w-full space-y-5 relative z-10">
-            
+
+            <div className="flex-grow flex flex-col items-start justify-start p-6 md:px-12 md:py-6 w-full space-y-5 relative z-10 min-h-[calc(100vh-80px)]">
+
             {/* Headers */}
             <div className="text-left space-y-3.5 w-full">
               <h1 className="text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-none font-public">
                 {currentLanguage === 'hi' ? 'मानचित्र जनरेटर' : 'Map Generator'}
               </h1>
               <p className="text-slate-600 text-sm md:text-[15px] font-semibold leading-relaxed max-w-3xl">
-                {currentLanguage === 'hi' 
-                  ? 'स्वायत्त जोखिम मूल्यांकन और कानूनी संरेखण सत्यापन के लिए संप्रभु नीति दस्तावेज या आंतरिक निर्देश अपलोड करें।' 
+                {currentLanguage === 'hi'
+                  ? 'स्वायत्त जोखिम मूल्यांकन और कानूनी संरेखण सत्यापन के लिए संप्रभु नीति दस्तावेज या आंतरिक निर्देश अपलोड करें।'
                   : 'Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.'}
-=======
-          <div className="relative z-10 flex-grow flex flex-col items-center justify-start p-6 md:p-12 w-full max-w-7xl mx-auto space-y-10 overflow-y-auto custom-scrollbar h-full">
-            
-            {/* Headers */}
-            <div className="text-center space-y-3.5">
-              <span className="text-[#00658d] font-bold text-xs tracking-[0.2em] uppercase block">
-                Autonomous Unified Risk Intelligence System
-              </span>
-              <h1 className="text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-none font-public">
-                Map Generator
-              </h1>
-              <p className="text-slate-600 text-sm md:text-[15px] font-semibold leading-relaxed max-w-3xl mx-auto">
-                Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
               </p>
             </div>
 
             {/* Glassmorphism Outer Card Wrapper with Shadow */}
             <div className="w-full bg-white/15 backdrop-blur-xl border border-white/25 rounded-3xl p-6 sm:p-8 shadow-2xl relative z-10">
-              
+
               {/* Split Panel Layout */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full items-start">
-                
+
                 {/* Left Column: Generate Task Card */}
                 <div className="lg:col-span-5 bg-white border border-[#c4c6cf] rounded-2xl shadow-sm overflow-hidden flex flex-col text-left">
-                  
+
                   {/* Collapsible Header */}
-                  <button 
+                  <button
                     onClick={() => setIsTaskExpanded(!isTaskExpanded)}
                     className="p-5 flex justify-between items-center border-b border-slate-200 bg-slate-50/50 cursor-pointer font-bold text-slate-850"
                   >
-<<<<<<< HEAD
                     <span className="text-[15px] font-bold text-[#003262] font-public">Generate Task</span>
-=======
-                    <span className="text-[15px] font-bold text-[#000a1e] font-public">Generate Task</span>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     {isTaskExpanded ? <ChevronUp className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
                   </button>
 
                   {/* Directives List */}
                   {isTaskExpanded && (
                     <div className="p-6 space-y-4">
-<<<<<<< HEAD
-                      <span className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">
-=======
-                      <span className="text-[10px] font-extrabold uppercase text-slate-400 tracking-wider">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
+                      <span className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider block">
                         Available Directives
                       </span>
-
-                      <div className="space-y-2 text-xs text-slate-700">
-                        {[
-                          { id: 'risk', label: 'Risk Assessment v1.2' },
-                          { id: 'geospatial', label: 'Geospatial Data Synthesis' },
-                          { id: 'policy', label: 'Policy Alignment Check' },
-                          { id: 'audit', label: 'Compliance Audit Trace' },
-                          { id: 'system', label: 'System Integrity Protocol' },
-                          { id: 'ops', label: 'Operational Security Scan' },
-                        ].map((item) => (
-                          <label 
-                            key={item.id} 
-                            className="flex items-center gap-3.5 cursor-pointer p-3 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100"
-                          >
-                            <input 
-                              type="checkbox" 
-                              checked={!!checkedDirectives[item.id]}
-                              onChange={() => handleToggleDirective(item.id)}
-<<<<<<< HEAD
-                              className="rounded border-[#c4c6cf] text-[#003262] focus:ring-[#003262]/20 h-4.5 w-4.5 cursor-pointer"
-=======
-                              className="rounded border-[#c4c6cf] text-[#000a1e] focus:ring-[#000a1e]/20 h-4.5 w-4.5 cursor-pointer"
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
-                            />
-                            <span className="text-xs font-semibold text-slate-855">{item.label}</span>
-                          </label>
-                        ))}
-                      </div>
+                      {[
+                        { id: 'risk', label: 'Risk Assessment v1.2' },
+                        { id: 'geospatial', label: 'Geospatial Data Synthesis' },
+                        { id: 'policy', label: 'Policy Alignment Check' },
+                        { id: 'audit', label: 'Compliance Audit Trace' },
+                        { id: 'system', label: 'System Integrity Protocol' },
+                        { id: 'ops', label: 'Operational Security Scan' },
+                      ].map((item) => (
+                        <label
+                          key={item.id}
+                          className="flex items-center gap-3.5 cursor-pointer p-3 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={!!checkedDirectives[item.id]}
+                            onChange={() => handleToggleDirective(item.id)}
+                            className="rounded border-[#c4c6cf] text-[#003262] focus:ring-[#003262]/20 h-4.5 w-4.5 cursor-pointer"
+                          />
+                          <span className="text-xs font-semibold text-slate-855">{item.label}</span>
+                        </label>
+                      ))}
                     </div>
                   )}
                 </div>
 
                 {/* Right Column: Tabbed Checkbox Container */}
-<<<<<<< HEAD
                 <div className="lg:col-span-7 bg-[#001b3d] text-white rounded-2xl p-6 shadow-md flex flex-col min-h-[300px] text-left border border-slate-850">
-=======
-                <div className="lg:col-span-7 bg-[#001b3d] text-white rounded-2xl p-6 shadow-md flex flex-col min-h-[440px] text-left border border-slate-850">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
-                  
+
                   {/* Horizontal Tab Headers */}
                   <div className="grid grid-cols-5 gap-1 sm:gap-2 border-b border-white/10 pb-4 text-[10px] sm:text-[11px] lg:text-xs font-bold text-white/50 mb-6 w-full text-center">
                     {[
@@ -1605,8 +1194,8 @@ Analytical user metadata and training weights may be relayed to globally distrib
                         key={tab.id}
                         onClick={() => setMapTab(tab.id)}
                         className={`pb-2 transition-all cursor-pointer relative font-bold tracking-normal sm:tracking-wider text-center ${
-                          mapTab === tab.id 
-                            ? "text-white font-black" 
+                          mapTab === tab.id
+                            ? "text-white font-black"
                             : "text-white/60 hover:text-white/80"
                         }`}
                       >
@@ -1623,7 +1212,6 @@ Analytical user metadata and training weights may be relayed to globally distrib
                   {/* Vertical Checkbox stack */}
                   <div className="flex-grow space-y-4">
                     {mapTab === 'banking' && (
-<<<<<<< HEAD
                       (checkedDirectives['risk'] || checkedDirectives['geospatial'] || checkedDirectives['audit']) ? (
                         <>
                           {checkedDirectives['risk'] && renderTaskCard('bank1', 'Risk Assessment v1.2', 'Comprehensive verification of retail account identification standards.')}
@@ -1663,37 +1251,6 @@ Analytical user metadata and training weights may be relayed to globally distrib
                           {checkedDirectives['ops'] && renderTaskCard('sup2', 'System Load Evaluator', 'Evaluating latency spikes during peak transaction sessions.')}
                         </>
                       ) : renderEmptyPlaceholder()
-=======
-                      <>
-                        {renderTaskCard('bank1', 'Risk Assessment v1.2', 'Comprehensive verification of retail account identification standards.')}
-                        {renderTaskCard('bank2', 'Geospatial Data Synthesis', 'Geospatial analysis of irregular transaction clusters.')}
-                        {renderTaskCard('bank3', 'Compliance Audit Trace', 'Algorithmic transparency verification for SME loans.')}
-                      </>
-                    )}
-                    {mapTab === 'finance' && (
-                      <>
-                        {renderTaskCard('fin1', 'Credit Risk Classifier v2.1', 'Autonomous evaluation of digital lending profiles.')}
-                        {renderTaskCard('fin2', 'Collateral Valuation Audit', 'Verifying asset valuation integrity protocols.')}
-                      </>
-                    )}
-                    {mapTab === 'compliance' && (
-                      <>
-                        {renderTaskCard('comp1', 'DPDP Compliance Matrix', 'Validation against primary data protection laws.')}
-                        {renderTaskCard('comp2', 'Cross-Border Flow Ledger', 'Tracing international data egress tunnels.')}
-                      </>
-                    )}
-                    {mapTab === 'security' && (
-                      <>
-                        {renderTaskCard('sec1', 'Core API Threat Shield', 'Active vulnerability analysis of banking endpoints.')}
-                        {renderTaskCard('sec2', 'Tokenized Vault Scan', 'Verifying cryptographic data shielding standards.')}
-                      </>
-                    )}
-                    {mapTab === 'support' && (
-                      <>
-                        {renderTaskCard('sup1', 'Incident Report Dispatcher', 'Autonomous alert synchronization for help desks.')}
-                        {renderTaskCard('sup2', 'System Load Evaluator', 'Evaluating latency spikes during peak transaction sessions.')}
-                      </>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
                     )}
                   </div>
 
@@ -1701,10 +1258,9 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
               </div>
 
-<<<<<<< HEAD
               {/* Bottom Centered Button Inside Card */}
               <div className="w-full flex justify-center pt-5 border-t border-slate-200/20 mt-2 relative z-10">
-                <button 
+                <button
                   onClick={handleSendAssignment}
                   className="px-12 py-3 bg-[#003262] hover:bg-black text-white text-xs font-bold rounded-lg shadow-lg transition-all active:scale-95 flex items-center gap-2 border border-slate-800 cursor-pointer"
                 >
@@ -1751,29 +1307,14 @@ Analytical user metadata and training weights may be relayed to globally distrib
               </div>
             </footer>
 
-=======
-            </div>
-
-            {/* Bottom Centered Button */}
-            <div className="w-full flex justify-center pt-4 relative z-10">
-              <button 
-                onClick={handleSendAssignment}
-                className="px-12 py-3.5 bg-[#000a1e] hover:bg-black text-white text-xs font-bold rounded-lg shadow-lg transition-all active:scale-95 flex items-center gap-2 border border-slate-800"
-              >
-                Submit To Assignments
-              </button>
-            </div>
-
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </div>
         )}
 
         {/* Validation view */}
         {activeSidebar === 'validation' && (
-<<<<<<< HEAD
           <div className="relative z-10 flex-grow flex flex-col w-full h-full overflow-y-auto custom-scrollbar">
-            
-            <div className="flex-grow flex flex-col items-start justify-start p-12 w-full text-left space-y-6 relative z-10">
+
+            <div className="flex-grow flex flex-col items-start justify-start p-12 w-full text-left space-y-6 relative z-10 min-h-[calc(100vh-80px)]">
             <div className="w-16 h-16 bg-[rgba(188, 155, 106, 0.2)] rounded-full flex items-center justify-center text-[#003262] mb-4 shadow">
               <ShieldCheck className="h-8 w-8 text-[#003262]" />
             </div>
@@ -1782,27 +1323,13 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 {currentLanguage === 'hi' ? 'सुरक्षा बही सत्यापन' : 'Security Ledger Validation'}
               </h2>
               <p className="text-sm font-semibold text-[#44474e] max-w-lg leading-relaxed">
-                {currentLanguage === 'hi' 
-                  ? 'संप्रभु हैश अनुक्रम अखंडता को सत्यापित करने और डेटा स्थानीयकरण मंजूरी सुनिश्चित करने के लिए तत्काल बहु-कारक क्रिप्टोग्राफिक जांच चलाएं।' 
+                {currentLanguage === 'hi'
+                  ? 'संप्रभु हैश अनुक्रम अखंडता को सत्यापित करने और डेटा स्थानीयकरण मंजूरी सुनिश्चित करने के लिए तत्काल बहु-कारक क्रिप्टोग्राफिक जांच चलाएं।'
                   : 'Run immediate multi-factor cryptographic checks to verify sovereign hash sequence integrity and ensure data localization clearances.'}
               </p>
             </div>
-            
+
             <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl font-mono text-[11.5px] leading-relaxed text-left w-full max-w-2xl max-h-[300px] overflow-y-auto custom-scrollbar shadow-inner">
-=======
-          <div className="relative z-10 flex-grow flex flex-col items-center justify-center p-8 max-w-4xl mx-auto w-full text-center space-y-6">
-            <div className="w-16 h-16 bg-[#d6e3ff] rounded-full flex items-center justify-center text-[#000a1e] mb-4 shadow">
-              <ShieldCheck className="h-8 w-8 text-[#000a1e]" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-3xl font-black text-[#000a1e] font-public">Security Ledger Validation</h2>
-              <p className="text-sm font-semibold text-[#44474e] max-w-lg leading-relaxed mx-auto">
-                Run immediate multi-factor cryptographic checks to verify sovereign hash sequence integrity and ensure data localization clearances.
-              </p>
-            </div>
-            
-            <div className="bg-slate-900 text-slate-100 p-6 rounded-2xl font-mono text-[10px] leading-relaxed text-left w-full max-w-2xl max-h-[300px] overflow-y-auto custom-scrollbar shadow-inner">
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
               <p className="text-emerald-400 font-bold mb-1">[SYSTEM INITIALIZATION] AURIS Core Auditing Agent initialized.</p>
               <p className="text-[#82cfff] mb-1">SHA-256 Checksum: c0b6b50aabee4ad3a33d8cb70843a90c...</p>
               <p className="text-[#82cfff] mb-1">Database connection status: SECURE NODE active.</p>
@@ -1810,10 +1337,9 @@ Analytical user metadata and training weights may be relayed to globally distrib
               <p className="text-slate-400 mb-1">Listening on local gateway interface 127.0.0.1:443...</p>
               <p className="text-amber-500 mb-1">[WARNING] 1 warning logs catalogued in active caches. Defer to supervisor review.</p>
             </div>
-            
-            <button 
+
+            <button
               onClick={() => setToast("Compiling cryptographic audit proof...")}
-<<<<<<< HEAD
               className="px-8 py-3 bg-[#003262] text-white font-bold text-xs rounded-lg shadow transition-all active:scale-95"
             >
               Sign Cryptographic Verification Proof
@@ -1862,16 +1388,17 @@ Analytical user metadata and training weights may be relayed to globally distrib
         {/* Assignments view */}
         {activeSidebar === 'assignments' && (
           <div className="relative z-10 flex-grow flex flex-col w-full h-full overflow-y-auto custom-scrollbar">
-            <div className="flex-grow flex flex-col items-start justify-start p-12 w-full text-left space-y-8 relative z-10">
-              
+            <div className="flex-grow flex flex-col items-start justify-start p-12 max-w-7xl mx-auto w-full text-left space-y-8 relative z-10 min-h-[calc(100vh-80px)]">
+
               {/* Header */}
               <div className="space-y-2 text-left w-full">
-                <h2 className="text-3xl font-black text-[#003262] font-public uppercase tracking-tight">
+                <h1 className="text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-none font-public">
                   {selectedAssignmentTab === 'banking' && (currentLanguage === 'hi' ? 'ग्राहक बैंकिंग ऑडिट' : 'Customer Banking Audits')}
                   {selectedAssignmentTab === 'finance' && (currentLanguage === 'hi' ? 'ऋण और वित्त ऑडिट' : 'Loans & Finance Audits')}
                   {selectedAssignmentTab === 'security' && (currentLanguage === 'hi' ? 'प्रौद्योगिकी और सुरक्षा ऑडिट' : 'Technology & Security Audits')}
                   {selectedAssignmentTab === 'support' && (currentLanguage === 'hi' ? 'संचालन और सहायता ऑडिट' : 'Operation & Support Audits')}
-                </h2>
+                  {selectedAssignmentTab === 'main' && (currentLanguage === 'hi' ? 'असाइनमेंट > मुख्य' : 'Assignments > Main')}
+                </h1>
                 <p className="text-sm font-semibold text-[#44474e] max-w-2xl leading-relaxed">
                   {selectedAssignmentTab === 'banking' && (
                     currentLanguage === 'hi'
@@ -1892,6 +1419,11 @@ Analytical user metadata and training weights may be relayed to globally distrib
                     currentLanguage === 'hi'
                       ? 'मदद डेस्क प्रतिक्रिया एसएलए, कंप्यूट सर्वर लोड थ्रेशोल्ड और दैनिक बैकअप डेटा अखंडता सिंक्रनाइज़ेशन चक्रों की निगरानी।'
                       : 'Monitoring of help desk response SLAs, compute server load thresholds, and daily backup data integrity synchronization cycles.'
+                  )}
+                  {selectedAssignmentTab === 'main' && (
+                    currentLanguage === 'hi'
+                      ? 'स्वायत्त जोखिम मूल्यांकन और कानूनी संरेखण सत्यापन के लिए संप्रभु नीति दस्तावेज या आंतरिक निर्देश अपलोड करें।'
+                      : 'Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.'
                   )}
                 </p>
               </div>
@@ -2257,7 +1789,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
                     <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
                       <div className="flex justify-between items-start">
                         <span className="text-[10px] bg-amber-50 text-amber-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Investigating</span>
-                        <span className="text-[10px] bg-slate-100 text-slate-650 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Medium Priority</span>
+                        <span className="text-[10px] bg-slate-100 text-slate-655 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Medium Priority</span>
                       </div>
                       <div className="space-y-1">
                         <h4 className="text-lg font-black text-[#003262]">Operational Security Scan</h4>
@@ -2284,6 +1816,95 @@ Analytical user metadata and training weights may be relayed to globally distrib
                       </div>
                     </div>
                   </>
+                )}
+
+                {selectedAssignmentTab === 'main' && (
+                  <div className="col-span-full w-full bg-[#1c7093] rounded-2xl p-8 shadow-2xl border border-white/10 text-white flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+                    {/* Header Row */}
+                    <div className="flex justify-between items-center text-xs font-black tracking-widest text-white/95 select-none uppercase px-2">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4.5 w-4.5 text-[#FDB515]" />
+                        <span>{currentLanguage === 'hi' ? 'कार्य' : 'Task'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Folder className="h-4.5 w-4.5 text-[#FDB515]" />
+                        <span>{currentLanguage === 'hi' ? 'विभाग का नाम' : 'Department Name'}</span>
+                      </div>
+                    </div>
+
+                    {/* Inner Container */}
+                    <div className="bg-[#124d67] rounded-2xl p-6 min-h-[480px] flex flex-col space-y-6">
+                      {/* Task Row 1 */}
+                      <div className="bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-300 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-inner">
+                        <div className="space-y-2 text-left max-w-xl">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[10px] bg-rose-500/20 text-rose-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Active</span>
+                            <span className="text-[10px] bg-orange-500/20 text-orange-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">High Priority</span>
+                          </div>
+                          <h4 className="text-lg font-black text-white">{currentLanguage === 'hi' ? 'कोर बही अखंडता जांच' : 'Core Ledger Integrity Check'}</h4>
+                          <p className="text-xs text-white/70 font-semibold leading-relaxed">
+                            {currentLanguage === 'hi'
+                              ? 'मुख्य लेखा बही और संप्रभु वित्तीय अनुपालन वैक्टर की निरंतर ऑडिट निगरानी।'
+                              : 'Continuous audit monitoring of the main accounting ledger and sovereign financial compliance vectors.'}
+                          </p>
+                          <div className="flex items-center gap-4 text-[11px] font-bold text-white/60 pt-1">
+                            <span>{currentLanguage === 'hi' ? 'नोड्स जाँचे गए: 8,530' : 'Ledger Nodes Checked: 8,530'}</span>
+                            <span className="text-emerald-300">RBI Standard Verified</span>
+                          </div>
+                          <div className="space-y-1.5 pt-1.5 max-w-xs">
+                            <div className="flex justify-between text-[10px] font-extrabold text-white/70">
+                              <span>{currentLanguage === 'hi' ? 'प्रगति' : 'Progress'}</span>
+                              <span>92%</span>
+                            </div>
+                            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                              <div className="bg-emerald-450 h-full rounded-full" style={{ width: '92%', backgroundColor: '#34d399' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0 text-left sm:text-right">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-black tracking-wider uppercase bg-[#1a6b8f] px-4 py-2 rounded-xl text-white border border-white/10 shadow-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            {currentLanguage === 'hi' ? 'प्रौद्योगिकी और सुरक्षा' : 'Technology & Security'}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Task Row 2 */}
+                      <div className="bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-300 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-inner">
+                        <div className="space-y-2 text-left max-w-xl">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Compliant</span>
+                            <span className="text-[10px] bg-slate-500/20 text-slate-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Medium Priority</span>
+                          </div>
+                          <h4 className="text-lg font-black text-white">{currentLanguage === 'hi' ? 'संप्रभु नियामक सिंक' : 'Sovereign Regulatory Sync'}</h4>
+                          <p className="text-xs text-white/70 font-semibold leading-relaxed">
+                            {currentLanguage === 'hi'
+                              ? 'मुख्य संचालन में आरबीआई के परिपत्रों और नियामक निर्देशों के साथ वास्तविक समय सिंक्रनाइज़ेशन सुनिश्चित करना।'
+                              : 'Ensuring real-time synchronization with RBI circulars and regulatory directives across main operations.'}
+                          </p>
+                          <div className="flex items-center gap-4 text-[11px] font-bold text-white/60 pt-1">
+                            <span>{currentLanguage === 'hi' ? 'सिंक अखंडता: 99.98%' : 'Sync Integrity: 99.98%'}</span>
+                            <span className="text-emerald-300">0.4s Delay</span>
+                          </div>
+                          <div className="space-y-1.5 pt-1.5 max-w-xs">
+                            <div className="flex justify-between text-[10px] font-extrabold text-white/70">
+                              <span>{currentLanguage === 'hi' ? 'प्रगति' : 'Progress'}</span>
+                              <span>100%</span>
+                            </div>
+                            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                              <div className="bg-teal-450 h-full rounded-full" style={{ width: '100%', backgroundColor: '#2dd4bf' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0 text-left sm:text-right">
+                          <span className="inline-flex items-center gap-1.5 text-xs font-black tracking-wider uppercase bg-[#1a6b8f] px-4 py-2 rounded-xl text-white border border-white/10 shadow-sm">
+                            <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                            {currentLanguage === 'hi' ? 'जोखिम और अनुपालन' : 'Risk & Compliance'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -2324,25 +1945,18 @@ Analytical user metadata and training weights may be relayed to globally distrib
               </div>
             </footer>
 
-=======
-              className="px-8 py-3 bg-[#000a1e] text-white font-bold text-xs rounded-lg shadow transition-all active:scale-95"
-            >
-              Sign Cryptographic Verification Proof
-            </button>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
           </div>
         )}
 
       </main>
 
-<<<<<<< HEAD
 
 
       {/* Sign Out Confirmation Modal */}
       {isSignOutModalOpen && (
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl shadow-2xl border border-slate-200/80 w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200 text-center p-6 space-y-6">
-            
+
             {/* Warning Badge Icon */}
             <div className="w-16 h-16 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
               <AlertTriangle className="h-8 w-8" />
@@ -2354,15 +1968,15 @@ Analytical user metadata and training weights may be relayed to globally distrib
                 {currentLanguage === 'hi' ? 'साइन आउट की पुष्टि' : 'Sign Out Confirmation'}
               </h3>
               <p className="text-slate-500 text-xs font-semibold leading-relaxed px-4">
-                {currentLanguage === 'hi' 
-                  ? 'क्या आप वास्तव में अपने सुरक्षित AURIS सत्र से बाहर निकलना चाहते हैं?' 
+                {currentLanguage === 'hi'
+                  ? 'क्या आप वास्तव में अपने सुरक्षित AURIS सत्र से बाहर निकलना चाहते हैं?'
                   : 'Do you really want to sign out of your secure AURIS session?'}
               </p>
             </div>
 
             {/* Button Actions */}
             <div className="flex gap-4 w-full">
-              <button 
+              <button
                 onClick={() => {
                   setIsSignOutModalOpen(false);
                   onNavigate('home');
@@ -2371,7 +1985,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
               >
                 {currentLanguage === 'hi' ? 'हाँ' : 'Yes'}
               </button>
-              <button 
+              <button
                 onClick={() => setIsSignOutModalOpen(false)}
                 className="flex-1 py-3 bg-white border-2 border-slate-200 hover:bg-slate-50 text-slate-700 font-extrabold text-xs tracking-wider rounded-xl transition-all duration-200 cursor-pointer active:scale-98 shadow-inner"
               >
@@ -2382,19 +1996,6 @@ Analytical user metadata and training weights may be relayed to globally distrib
           </div>
         </div>
       )}
-=======
-      {/* Footer */}
-      <footer className="absolute bottom-0 left-72 right-0 border-t border-[#c4c6cf] py-3.5 px-12 bg-white/95 backdrop-blur z-20 text-[10.5px] text-[#44474e] font-bold">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>© 2026 Autonomous Unified Risk Intelligence System (AURIS). All rights reserved.</p>
-          <div className="flex gap-6">
-            <button onClick={() => alert("AURIS Security Standard v5.0")} className="hover:text-[#000a1e] transition-colors">Help</button>
-            <button onClick={() => alert("AURIS Privacy Protocols")} className="hover:text-[#000a1e] transition-colors">Privacy Policy</button>
-            <button onClick={() => alert("AURIS Terms of Service")} className="hover:text-[#000a1e] transition-colors">Terms of Service</button>
-          </div>
-        </div>
-      </footer>
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
 
     </div>
   );

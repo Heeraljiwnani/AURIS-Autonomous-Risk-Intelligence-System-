@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
@@ -54,21 +53,6 @@ function App() {
           {view === 'dashboard' && <RegulatoryDashboard onNavigate={handleNavigate} />}
         </>
       )}
-=======
-import React, { useState } from 'react';
-import LandingPage from './components/LandingPage';
-import LoginPage from './components/LoginPage';
-import RegulatoryDashboard from './components/RegulatoryDashboard';
-
-function App() {
-  const [view, setView] = useState('home');
-
-  return (
-    <>
-      {view === 'home' && <LandingPage onNavigate={setView} />}
-      {view === 'login' && <LoginPage onNavigate={setView} />}
-      {view === 'dashboard' && <RegulatoryDashboard onNavigate={setView} />}
->>>>>>> 2160a878ded497201a77800488f680a69eeea164
     </>
   );
 }
