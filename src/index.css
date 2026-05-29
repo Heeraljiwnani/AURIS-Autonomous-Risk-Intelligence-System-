@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-smooth: always;
+}
+
+/* Ensure children elements are placed on proper rendering layers to prevent blur */
+body, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6 {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Prevent text blur caused by backdrop-filter scaling and pixel offsets */
+.backdrop-blur-md, .backdrop-blur-3xl, .backdrop-blur-xl, .backdrop-blur-\[10px\] {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Hero Background Section */
+.hero-bg {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.45)), url('/india_gate_sunset.png');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+/* Login Background */
+.login-bg {
+  background-image: url('/login-bg.png');
+  background-size: cover;
+  background-position: center;
+  transition: background-position 0.1s ease-out;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* Micro-animations and effects */
+.scale-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.scale-hover:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.08);
+}
+
+.glow-btn {
+  position: relative;
+  overflow: hidden;
+}
+.glow-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  transition: 0.75s;
+  opacity: 0;
+}
+.glow-btn:hover::after {
+  left: 125%;
+  opacity: 1;
+}
+
+/* Scroll reveal triggers for landing page components */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Workflow vertical connecting line style */
+.workflow-line {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #3b82f6 0%, #1e40af 100%);
+  z-index: 0;
+}
+
+@media (min-width: 768px) {
+  .workflow-line {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* Cascading delays for staggered scroll reveals */
+.delay-100 {
+  transition-delay: 100ms !important;
+}
+.delay-200 {
+  transition-delay: 200ms !important;
+}
+.delay-300 {
+  transition-delay: 300ms !important;
+}
+.delay-400 {
+  transition-delay: 400ms !important;
+}
