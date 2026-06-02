@@ -36,7 +36,214 @@ export default function RegulatoryDashboard({ onNavigate }) {
   });
   const [sidebarHistory, setSidebarHistory] = useState([]);
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
-  const [selectedAssignmentTab, setSelectedAssignmentTab] = useState('main');
+  const [selectedDepts, setSelectedDepts] = useState([]);
+  const [selectedAssignmentTab, setSelectedAssignmentTab] = useState('Retail Banking Department');
+
+  // Load departments on mount
+  useEffect(() => {
+    const fetchOrgDetails = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/organisation');
+        if (response.ok) {
+          const data = await response.json();
+          if (data && Array.isArray(data.selected_depts) && data.selected_depts.length > 0) {
+            setSelectedDepts(data.selected_depts);
+            setSelectedAssignmentTab(data.selected_depts[0]);
+            setMapTab(data.selected_depts[0]);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('⚠️ Backend server offline. Falling back to local storage.');
+      }
+      
+      const localDepts = localStorage.getItem('auris_selected_depts');
+      if (localDepts) {
+        try {
+          const parsed = JSON.parse(localDepts);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSelectedDepts(parsed);
+            setSelectedAssignmentTab(parsed[0]);
+            setMapTab(parsed[0]);
+            return;
+          }
+        } catch (e) {}
+      }
+      
+      // Default initial departments if nothing saved
+      const defaultDepts = [
+        "Retail Banking Department",
+        "Credit & Loans Department",
+        "Risk Management Department",
+        "Information Technology (IT) Department",
+        "Human Resources (HR) Department"
+      ];
+      setSelectedDepts(defaultDepts);
+      setSelectedAssignmentTab("Retail Banking Department");
+      setMapTab("Retail Banking Department");
+    };
+    fetchOrgDetails();
+  }, []);
+
+  const [uploadedFiles, setUploadedFiles] = useState(() => {
+    const saved = localStorage.getItem('auris_uploaded_files');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [
+      { name: "Sovereign Digital Privacy Directives 2025.pdf", size: "2.4 MB" },
+      { name: "Reserve Bank Integrity Standards v4.pdf", size: "1.8 MB" },
+      { name: "National Cybersecurity Framework 2026.pdf", size: "4.1 MB" },
+      { name: "SME Digital KYC Regulation v2.pdf", size: "1.5 MB" }
+    ];
+  });
+
+  const [selectedIngestFile, setSelectedIngestFile] = useState(() => {
+    return localStorage.getItem('auris_selected_ingest_file') || "Sovereign Digital Privacy Directives 2025.pdf";
+  });
+
+  const [isAiScanning, setIsAiScanning] = useState(false);
+
+  const [assignedTasks, setAssignedTasks] = useState(() => {
+    const saved = localStorage.getItem('auris_assigned_tasks');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [];
+  });
+
+  const pdfScrollRef = useRef(null);
+
+  const scrollPdfs = (direction) => {
+    if (pdfScrollRef.current) {
+      const scrollAmount = 200;
+      pdfScrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const getAIGeneratedTasks = (fileName) => {
+    if (!fileName) return [];
+    const name = fileName.toLowerCase();
+    
+    if (name.includes('privacy') || name.includes('personal') || name.includes('sovereign')) {
+      return [
+        {
+          id: 'task-p1',
+          title: 'DPDP Consent Verification',
+          desc: `Verify that raw customer records are geofenced as mandated by the DPDP Act and no silent bypass exists. [Ingested from ${fileName}]`,
+          department: 'banking',
+          priority: 'Critical Priority',
+          status: 'Active',
+          progress: 65,
+          fileName: fileName
+        },
+        {
+          id: 'task-p2',
+          title: 'Geographic Data Audit',
+          desc: `Validate that analytical metadata logs are stored domestically to avoid regulatory geofencing infractions. [Ingested from ${fileName}]`,
+          department: 'compliance',
+          priority: 'High Priority',
+          status: 'Active',
+          progress: 45,
+          fileName: fileName
+        },
+        {
+          id: 'task-p3',
+          title: 'API Threat Shield Sync',
+          desc: `Audit third-party client API tokens and verify cryptographic shielding against local data exposure. [Ingested from ${fileName}]`,
+          department: 'security',
+          priority: 'High Priority',
+          status: 'Active',
+          progress: 80,
+          fileName: fileName
+        },
+        {
+          id: 'task-p4',
+          title: 'Consent Pruning Protocol',
+          desc: `Implement automated background scripts to prune consent files of inactive customer accounts past 180 days. [Ingested from ${fileName}]`,
+          department: 'support',
+          priority: 'Medium Priority',
+          status: 'Active',
+          progress: 30,
+          fileName: fileName
+        }
+      ];
+    } else if (name.includes('bank') || name.includes('integrity') || name.includes('reserve')) {
+      return [
+        {
+          id: 'task-b1',
+          title: 'Core Ledger Audit Trace',
+          desc: `Verify accounting ledgers and core transaction logs against sovereign financial compliance directives. [Ingested from ${fileName}]`,
+          department: 'banking',
+          priority: 'Critical Priority',
+          status: 'Active',
+          progress: 85,
+          fileName: fileName
+        },
+        {
+          id: 'task-b2',
+          title: 'Risk Profiler Classification',
+          desc: `Audit digital lending compliance and credit risk classification algorithms for transparency validation. [Ingested from ${fileName}]`,
+          department: 'finance',
+          priority: 'High Priority',
+          status: 'Active',
+          progress: 50,
+          fileName: fileName
+        },
+        {
+          id: 'task-b3',
+          title: 'Cryptographic Vault Scan',
+          desc: `Continuous security scanning of core server storage vaults holding sensitive transaction records. [Ingested from ${fileName}]`,
+          department: 'security',
+          priority: 'High Priority',
+          status: 'Active',
+          progress: 90,
+          fileName: fileName
+        }
+      ];
+    } else {
+      const cleanName = fileName.replace('.pdf', '');
+      return [
+        {
+          id: 'task-c1',
+          title: `${cleanName} Ingestion Sync`,
+          desc: `Continuous verification of operational files and regulatory alignment validation for ${fileName}.`,
+          department: 'compliance',
+          priority: 'High Priority',
+          status: 'Active',
+          progress: 60,
+          fileName: fileName
+        },
+        {
+          id: 'task-c2',
+          title: `${cleanName} Threat Check`,
+          desc: `Cybersecurity auditing and access control trace on systems related to ${fileName}.`,
+          department: 'security',
+          priority: 'High Priority',
+          status: 'Active',
+          progress: 75,
+          fileName: fileName
+        }
+      ];
+    }
+  };
+
+  const getDeptCategory = (deptName) => {
+    if (!deptName) return 'main';
+    const name = deptName.toLowerCase();
+    if (name.includes('banking') || name.includes('treasury')) return 'banking';
+    if (name.includes('credit') || name.includes('loans') || name.includes('risk')) return 'finance';
+    if (name.includes('compliance') || name.includes('it') || name.includes('technology') || name.includes('audit')) return 'security';
+    if (name.includes('resources') || name.includes('hr') || name.includes('operation') || name.includes('support')) return 'support';
+    return 'main';
+  };
 
   const navigateToSidebar = (nextSidebar) => {
     if (activeSidebar !== nextSidebar) {
@@ -75,12 +282,17 @@ export default function RegulatoryDashboard({ onNavigate }) {
   const [activeTab, setActiveTab] = useState('infractions');
 
   // Map Generator states
-  const [mapTab, setMapTab] = useState('banking');
+  const [mapTab, setMapTab] = useState('Retail Banking Department');
 
   const [isTaskExpanded, setIsTaskExpanded] = useState(false);
   const [checkedDirectives, setCheckedDirectives] = useState(() => {
     const saved = localStorage.getItem('auris_checked_directives');
-    return saved ? JSON.parse(saved) : {};
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return {};
   });
 
   const directiveMapping = {
@@ -96,9 +308,10 @@ export default function RegulatoryDashboard({ onNavigate }) {
     const isNowChecked = !checkedDirectives[id];
     setCheckedDirectives(prev => ({ ...prev, [id]: isNowChecked }));
 
-    const tab = directiveMapping[id];
-    if (tab && isNowChecked) {
-      setMapTab(tab);
+    const category = directiveMapping[id];
+    if (category && isNowChecked) {
+      const matchingDept = selectedDepts.find(d => getDeptCategory(d) === category) || selectedDepts[0] || 'Retail Banking Department';
+      setMapTab(matchingDept);
     }
   };
 
@@ -285,6 +498,17 @@ Analytical user metadata and training weights may be relayed to globally distrib
         const formattedSize = file.size > 1024 * 1024
           ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
           : `${(file.size / 1024).toFixed(1)} KB`;
+        const newFile = { name: file.name, size: formattedSize };
+        setUploadedFiles(prev => {
+          const exists = prev.some(f => f.name === file.name);
+          if (exists) return prev;
+          const updated = [...prev, newFile];
+          localStorage.setItem('auris_uploaded_files', JSON.stringify(updated));
+          return updated;
+        });
+        setSelectedIngestFile(file.name);
+        localStorage.setItem('auris_selected_ingest_file', file.name);
+
         setSelectedFile({ name: file.name, size: formattedSize });
         setScanStep(0);
         setCurrentView('scanning');
@@ -302,6 +526,17 @@ Analytical user metadata and training weights may be relayed to globally distrib
         const formattedSize = file.size > 1024 * 1024
           ? `${(file.size / (1024 * 1024)).toFixed(1)} MB`
           : `${(file.size / 1024).toFixed(1)} KB`;
+        const newFile = { name: file.name, size: formattedSize };
+        setUploadedFiles(prev => {
+          const exists = prev.some(f => f.name === file.name);
+          if (exists) return prev;
+          const updated = [...prev, newFile];
+          localStorage.setItem('auris_uploaded_files', JSON.stringify(updated));
+          return updated;
+        });
+        setSelectedIngestFile(file.name);
+        localStorage.setItem('auris_selected_ingest_file', file.name);
+
         setSelectedFile({ name: file.name, size: formattedSize });
         setScanStep(0);
         setCurrentView('scanning');
@@ -381,24 +616,25 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
       {/* Left Sidebar Navigation - STITCH PERFECT DESIGN */}
 
-      <aside className={`relative bg-[#edeeef] flex flex-col border-r border-[#c4c6cf] z-30 transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-20' : 'w-72'}`}>
+      <aside className={`relative bg-[#edeeef] flex flex-col border-r border-[#c4c6cf] z-50 transition-all duration-300 ease-in-out ${isSidebarCollapsed ? 'w-20' : 'w-72'}`}>
+        {/* Floating Border Collapse/Expand Toggle Button */}
+        <button
+          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          className="absolute top-[80px] -right-3.5 w-7 h-7 bg-[#003262] hover:bg-[#004b87] text-white rounded-full flex items-center justify-center border border-[#c4c6cf] shadow-md transition-all duration-200 z-50 cursor-pointer active:scale-95"
+          title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          {isSidebarCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </button>
+
         {/* Brand Identity & Collapse Control */}
         <div className={`p-6 flex items-center transition-all duration-300 ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
-          <button
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="p-1.5 text-[#44474e] hover:text-[#003262] rounded-lg hover:bg-[#e7e8e9] transition-colors flex-shrink-0 cursor-pointer"
-            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            <Menu className="h-5.5 w-5.5" />
-          </button>
-
+          <img src="/auris-logo.png" className="w-9 h-9 rounded-lg object-cover shadow-md flex-shrink-0" alt="AURIS Logo" />
           {!isSidebarCollapsed && (
-            <>
-              <div className="w-9 h-9 bg-[#003262] rounded-lg flex items-center justify-center text-white shadow-md flex-shrink-0">
-                <Shield className="h-4.5 w-4.5 fill-current text-white" />
-              </div>
-              <span className="text-xl font-bold tracking-tight text-[#003262] font-public uppercase">AURIS</span>
-            </>
+            <span className="text-xl font-bold tracking-tight text-[#003262] font-public uppercase animate-fade-in">AURIS</span>
           )}
         </div>
 
@@ -443,14 +679,30 @@ Analytical user metadata and training weights may be relayed to globally distrib
           <div className="pt-2 w-full">
             <button
                 onClick={() => {
-                navigateToSidebar('assignments');
-                setSelectedAssignmentTab('main');
                 if (isSidebarCollapsed) {
                   setIsSidebarCollapsed(false);
+                  setAssignmentsExpanded(true);
+                  navigateToSidebar('assignments');
+                  if (selectedDepts.length > 0) {
+                    setSelectedAssignmentTab(selectedDepts[0]);
+                  } else {
+                    setSelectedAssignmentTab('Retail Banking Department');
+                  }
+                } else {
+                  if (activeSidebar === 'assignments') {
+                    setAssignmentsExpanded(!assignmentsExpanded);
+                  } else {
+                    navigateToSidebar('assignments');
+                    setAssignmentsExpanded(true);
+                    if (selectedDepts.length > 0) {
+                      setSelectedAssignmentTab(selectedDepts[0]);
+                    } else {
+                      setSelectedAssignmentTab('Retail Banking Department');
+                    }
+                  }
                 }
-                setAssignmentsExpanded(true);
               }}
-              title={isSidebarCollapsed ? "Assignments" : undefined}
+              title={isSidebarCollapsed ? "Departments" : undefined}
               className={`w-full flex items-center justify-between transition-all ${
                 isSidebarCollapsed
                   ? "justify-center py-3 px-0 rounded-xl font-bold"
@@ -463,63 +715,30 @@ Analytical user metadata and training weights may be relayed to globally distrib
             >
               <div className={`flex items-center ${isSidebarCollapsed ? '' : 'gap-3'}`}>
                 <ClipboardList className="h-5 w-5 flex-shrink-0" />
-                {!isSidebarCollapsed && <span className="text-sm">Assignments</span>}
+                {!isSidebarCollapsed && <span className="text-sm">Departments</span>}
               </div>
               {!isSidebarCollapsed && (assignmentsExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />)}
             </button>
 
              {!isSidebarCollapsed && assignmentsExpanded && (
               <div className="ml-10 mt-1 space-y-1 border-l border-[#c4c6cf] pl-4 text-left">
-                <button
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('main'); setToast("Loading Main audits..."); }}
-                  className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
-                    activeSidebar === 'assignments' && selectedAssignmentTab === 'main'
-                      ? "text-[#003262] font-black"
-                      : "text-[#44474e] font-semibold hover:text-[#003262]"
-                  }`}
-                >
-                  Main
-                </button>
-                <button
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('banking'); setToast("Loading Customer Banking audits..."); }}
-                  className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
-                    activeSidebar === 'assignments' && selectedAssignmentTab === 'banking'
-                      ? "text-[#003262] font-black"
-                      : "text-[#44474e] font-semibold hover:text-[#003262]"
-                  }`}
-                >
-                  Customer Banking
-                </button>
-                <button
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('finance'); setToast("Loading Loans & Finance audits..."); }}
-                  className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
-                    activeSidebar === 'assignments' && selectedAssignmentTab === 'finance'
-                      ? "text-[#003262] font-black"
-                      : "text-[#44474e] font-semibold hover:text-[#003262]"
-                  }`}
-                >
-                  Loans & Finance
-                </button>
-                <button
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('security'); setToast("Loading Technology & Security audits..."); }}
-                  className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
-                    activeSidebar === 'assignments' && selectedAssignmentTab === 'security'
-                      ? "text-[#003262] font-black"
-                      : "text-[#44474e] font-semibold hover:text-[#003262]"
-                  }`}
-                >
-                  Technology & Security
-                </button>
-                <button
-                  onClick={() => { navigateToSidebar('assignments'); setSelectedAssignmentTab('support'); setToast("Loading Operation & Support audits..."); }}
-                  className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all ${
-                    activeSidebar === 'assignments' && selectedAssignmentTab === 'support'
-                      ? "text-[#003262] font-black"
-                      : "text-[#44474e] font-semibold hover:text-[#003262]"
-                  }`}
-                >
-                  Operation & Support
-                </button>
+                {selectedDepts.map((dept) => (
+                  <button
+                    key={dept}
+                    onClick={() => {
+                      navigateToSidebar('assignments');
+                      setSelectedAssignmentTab(dept);
+                      setToast(`Loading ${dept.split(' ')[0]} audits...`);
+                    }}
+                    className={`block w-full text-left py-1.5 text-xs hover:translate-x-1 transition-all truncate ${
+                      activeSidebar === 'assignments' && selectedAssignmentTab === dept
+                        ? "text-[#003262] font-black"
+                        : "text-[#44474e] font-semibold hover:text-[#003262]"
+                    }`}
+                  >
+                    {dept.replace(/\s*Department\s*/gi, '')}
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -552,48 +771,43 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
         <header className="relative z-40 w-full px-12 py-3 flex justify-between items-center bg-[#f8f9fa]/85 backdrop-blur-md border-b border-[#c4c6cf] shadow-[0_2px_12px_-5px_rgba(0,0,0,0.05)] transition-all duration-300">
 
-          {/* Left panel oversight spacing placeholder */}
-          <button
-            onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-[#c4c6cf] text-[#003262] font-black text-xs uppercase tracking-wider rounded-xl shadow-sm hover:bg-[#003262] hover:text-white hover:border-[#003262] hover:shadow-md transition-all duration-300 cursor-pointer active:scale-95 group focus:outline-none"
-            title={currentLanguage === 'hi' ? 'पिछले स्क्रीन पर वापस जाएं' : 'Go back to previous screen'}
-          >
-            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5 text-current" />
-            <span>{currentLanguage === 'hi' ? 'वापस' : 'Back'}</span>
-          </button>
+          {/* Left panel spacer */}
+          <div></div>
 
           {/* Interactive Right Control Group */}
           <div className="flex items-center gap-5">
 
-            {/* Language Switch Segmented Button Toggle */}
-            <div className="flex items-center bg-slate-200/50 p-0.5 rounded-xl border border-slate-300/40 shadow-inner">
+            {/* Highly aesthetic circular India flag language switcher toggle */}
+            <div className="flex items-center gap-3 select-none font-extrabold text-xs tracking-wider">
+              <span className={`transition-colors duration-300 ${currentLanguage === 'en' ? 'text-[#003262]' : 'text-slate-400'}`}>EN</span>
               <button
                 onClick={() => {
-                  setCurrentLanguage('en');
-                  setToast("Language switched to English");
+                  const nextLang = currentLanguage === 'en' ? 'hi' : 'en';
+                  setCurrentLanguage(nextLang);
+                  setToast(nextLang === 'en' ? "Language switched to English" : "भाषा बदलकर हिंदी कर दी गई है");
                 }}
-                className={`px-3 py-1 rounded-lg text-[12px] font-black tracking-wider transition-all duration-200 cursor-pointer ${currentLanguage === 'en' ? 'bg-[#003262] text-white shadow-sm scale-100' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/40'}`}
+                className="w-16 h-8 bg-slate-200/80 backdrop-blur-sm border border-slate-300/80 rounded-full p-1 relative flex items-center cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.15)] transition-all duration-300 hover:border-slate-400/60 active:scale-95"
+                aria-label="Toggle Language"
               >
-                EN
+                {/* Sliding India flag thumb */}
+                <div
+                  className={`w-6 h-6 rounded-full transition-transform duration-300 transform shadow-[0_2px_6px_rgba(0,0,0,0.25)] flex items-center justify-center overflow-hidden bg-white ${
+                    currentLanguage === 'en' ? 'translate-x-0' : 'translate-x-8'
+                  }`}
+                >
+                  <svg viewBox="0 0 30 30" className="w-full h-full scale-105">
+                    <rect width="30" height="10" fill="#FF9933" />
+                    <rect y="10" width="30" height="10" fill="#FFFFFF" />
+                    <rect y="20" width="30" height="10" fill="#138808" />
+                    <circle cx="15" cy="15" r="2.5" fill="none" stroke="#000080" strokeWidth="0.4" />
+                    <path d="M 15 12.5 L 15 17.5 M 12.5 15 L 17.5 15 M 13.2 13.2 L 16.8 16.8 M 13.2 16.8 L 16.8 13.2" stroke="#000080" strokeWidth="0.25" />
+                  </svg>
+                </div>
               </button>
-              <button
-                onClick={() => {
-                  setCurrentLanguage('hi');
-                  setToast("भाषा बदलकर हिंदी कर दी गई है");
-                }}
-                className={`px-3 py-1 rounded-lg text-[12px] font-black tracking-wider transition-all duration-200 cursor-pointer ${currentLanguage === 'hi' ? 'bg-[#003262] text-white shadow-sm scale-100' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/40'}`}
-              >
-                हिंदी
-              </button>
+              <span className={`transition-colors duration-300 ${currentLanguage === 'hi' ? 'text-[#003262]' : 'text-slate-400'}`}>HI</span>
             </div>
 
-            {/* Sovereign Network secure indicator */}
-            <span className="hidden sm:flex items-center gap-1.5 text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200/60 shadow-sm select-none">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[11.5px] font-extrabold uppercase tracking-widest leading-none">
-                {currentLanguage === 'hi' ? 'नेटवर्क सुरक्षित' : 'Network Secure'}
-              </span>
-            </span>
+
 
             {/* Settings Trigger Icon */}
             <button
@@ -1072,37 +1286,14 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
             {/* The beautiful landing page footer! */}
             {currentView !== 'scanning' && (
-              <footer className="w-full bg-slate-900 text-white py-12 border-t-4 border-orange-500 mt-12 z-20 text-center">
-                <div className="max-w-7xl mx-auto px-6 space-y-8">
-                  {/* Main Footer Links */}
-                  <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-xs font-bold text-gray-300 border-b border-white/10 pb-8 uppercase tracking-widest">
-                    <button onClick={() => setToast("About Us page linked.")} className="hover:text-white transition-colors">About Us</button>
-                    <span className="text-white/20">/</span>
-                    <button onClick={() => setToast("Help documentation linked.")} className="hover:text-white transition-colors">Help</button>
-                    <span className="text-white/20">/</span>
-                    <button onClick={() => setToast("Site map opened.")} className="hover:text-white transition-colors">Sitemap</button>
-                    <span className="text-white/20">/</span>
-                    <button onClick={() => setToast("Website Policies and Terms linked.")} className="hover:text-white transition-colors">Website Policies</button>
-                    <span className="text-white/20">/</span>
-                    <button onClick={() => setToast("Loading feedback desk...")} className="hover:text-white transition-colors">Feedback</button>
-                    <span className="text-white/20">/</span>
-                    <button onClick={() => setToast("Contact Information opened.")} className="hover:text-white transition-colors">Contact Us</button>
-                  </div>
-                  {/* Copyright details */}
-                  <div className="flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4 text-left">
-                    <div className="text-center md:text-left space-y-1">
-                      <p className="leading-relaxed">
-                        © Developed and hosted by <span className="text-white font-semibold">National Informatics Centre</span>,
-                      </p>
-                      <p className="leading-relaxed">
-                        Ministry of Law &amp; Justice, Information Technology, <span className="text-white font-bold">Government of India</span>
-                      </p>
-                    </div>
-                    <div className="text-center md:text-right font-bold space-y-1">
-                      <p>Last Updated: <span className="text-blue-400">May 27, 2026</span></p>
-                      <p className="text-[10px] text-slate-500 font-semibold uppercase">AURIS Portal version 2.4.2</p>
-                    </div>
-                  </div>
+              <footer className="w-full bg-[#0b1329] text-left py-6 border-t-4 border-[#f57c00] mt-auto z-20">
+                <div className="w-full px-12 text-[11px] leading-relaxed text-slate-400 font-medium">
+                  <p>
+                    © Developed and hosted by <strong className="text-white font-bold">National Informatics Centre</strong>,
+                  </p>
+                  <p>
+                    Ministry of Law &amp; Justice, Information Technology, <strong className="text-white font-bold">Government of India</strong>
+                  </p>
                 </div>
               </footer>
             )}
@@ -1115,7 +1306,7 @@ Analytical user metadata and training weights may be relayed to globally distrib
         {activeSidebar === 'map' && (
           <div className="relative z-10 flex-grow flex flex-col w-full h-full overflow-y-auto custom-scrollbar">
 
-            <div className="flex-grow flex flex-col items-start justify-start p-6 md:px-12 md:py-6 w-full space-y-5 relative z-10 min-h-[calc(100vh-80px)]">
+            <div className="flex-grow flex flex-col items-start justify-start p-6 md:px-12 md:py-6 w-full space-y-5 relative z-10" style={{ minHeight: '100vh' }}>
 
             {/* Headers */}
             <div className="text-left space-y-3.5 w-full">
@@ -1143,128 +1334,192 @@ Analytical user metadata and training weights may be relayed to globally distrib
                     onClick={() => setIsTaskExpanded(!isTaskExpanded)}
                     className="p-5 flex justify-between items-center border-b border-slate-200 bg-slate-50/50 cursor-pointer font-bold text-slate-850"
                   >
-                    <span className="text-[15px] font-bold text-[#003262] font-public">Generate Task</span>
+                    <span className="text-[15px] font-bold text-[#003262] font-public">AI Task Ingestion</span>
                     {isTaskExpanded ? <ChevronUp className="h-4 w-4 text-slate-500" /> : <ChevronDown className="h-4 w-4 text-slate-500" />}
                   </button>
 
-                  {/* Directives List */}
+                  {/* PDF Document Carousel */}
                   {isTaskExpanded && (
-                    <div className="p-6 space-y-4">
-                      <span className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider block">
-                        Available Directives
-                      </span>
-                      {[
-                        { id: 'risk', label: 'Risk Assessment v1.2' },
-                        { id: 'geospatial', label: 'Geospatial Data Synthesis' },
-                        { id: 'policy', label: 'Policy Alignment Check' },
-                        { id: 'audit', label: 'Compliance Audit Trace' },
-                        { id: 'system', label: 'System Integrity Protocol' },
-                        { id: 'ops', label: 'Operational Security Scan' },
-                      ].map((item) => (
-                        <label
-                          key={item.id}
-                          className="flex items-center gap-3.5 cursor-pointer p-3 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={!!checkedDirectives[item.id]}
-                            onChange={() => handleToggleDirective(item.id)}
-                            className="rounded border-[#c4c6cf] text-[#003262] focus:ring-[#003262]/20 h-4.5 w-4.5 cursor-pointer"
-                          />
-                          <span className="text-xs font-semibold text-slate-855">{item.label}</span>
-                        </label>
-                      ))}
+                    <div className="p-6 space-y-5">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider block">
+                          Select Document to Ingest
+                        </span>
+                        {/* Horizontal Scroll Chevron Buttons */}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => scrollPdfs('left')}
+                            className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-200 active:scale-95 transition-all shadow-sm cursor-pointer"
+                            title="Scroll Left"
+                          >
+                            <ChevronLeft className="h-4.5 w-4.5" />
+                          </button>
+                          <button
+                            onClick={() => scrollPdfs('right')}
+                            className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-200 active:scale-95 transition-all shadow-sm cursor-pointer"
+                            title="Scroll Right"
+                          >
+                            <ChevronRight className="h-4.5 w-4.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Horizontally Scrollable PDF Container */}
+                      <div
+                        ref={pdfScrollRef}
+                        className="flex gap-4 overflow-x-auto pb-3 custom-scrollbar snap-x snap-mandatory"
+                        style={{ scrollbarWidth: 'thin' }}
+                      >
+                        {uploadedFiles.map((file) => {
+                          const isSelected = selectedIngestFile === file.name;
+                          return (
+                            <div
+                              key={file.name}
+                              onClick={() => {
+                                if (isSelected) return;
+                                setSelectedIngestFile(file.name);
+                                localStorage.setItem('auris_selected_ingest_file', file.name);
+                                setIsAiScanning(true);
+                                setToast(`AI is scanning: ${file.name}...`);
+                                setTimeout(() => {
+                                  setIsAiScanning(false);
+                                  setToast(`Compliance mapping successfully extracted!`);
+                                }, 1500);
+                              }}
+                              className={`flex-shrink-0 w-[180px] snap-center p-4 border rounded-xl cursor-pointer hover:shadow-md hover:scale-102 active:scale-98 transition-all flex flex-col space-y-3 relative overflow-hidden bg-slate-50/50 ${
+                                isSelected
+                                  ? 'border-[#003262] bg-blue-50/20 ring-2 ring-[#003262]/10'
+                                  : 'border-[#cbd5e1] hover:border-slate-400'
+                              }`}
+                            >
+                              {/* Selection Checked Badge */}
+                              {isSelected && (
+                                <div className="absolute top-2 right-2 text-emerald-500 bg-white rounded-full p-0.5 shadow-sm">
+                                  <CheckCircle2 className="h-4 w-4" />
+                                </div>
+                              )}
+                              <FileText className={`h-8 w-8 ${isSelected ? 'text-[#003262]' : 'text-slate-400'}`} />
+                              <div className="space-y-0.5 text-left">
+                                <h5 className="text-[11.5px] font-black text-slate-800 leading-tight truncate w-full" title={file.name}>
+                                  {file.name}
+                                </h5>
+                                <p className="text-[10px] text-slate-400 font-extrabold">{file.size}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      
                     </div>
                   )}
                 </div>
 
                 {/* Right Column: Tabbed Checkbox Container */}
-                <div className="lg:col-span-7 bg-[#001b3d] text-white rounded-2xl p-6 shadow-md flex flex-col min-h-[300px] text-left border border-slate-850">
+                <div className="lg:col-span-7 bg-[#001b3d] text-white rounded-2xl p-4 shadow-md flex flex-col text-left border border-slate-850" style={{ maxHeight: '380px' }}>
 
-                  {/* Horizontal Tab Headers */}
-                  <div className="grid grid-cols-5 gap-1 sm:gap-2 border-b border-white/10 pb-4 text-[10px] sm:text-[11px] lg:text-xs font-bold text-white/50 mb-6 w-full text-center">
-                    {[
-                      { id: 'banking', label: 'Customer Banking', mediumLabel: 'Banking', shortLabel: 'CB' },
-                      { id: 'finance', label: 'Loans & Finance', mediumLabel: 'Loans & Fin', shortLabel: 'LF' },
-                      { id: 'compliance', label: 'Risk & Compliance', mediumLabel: 'Risk & Comp', shortLabel: 'RC' },
-                      { id: 'security', label: 'Technology & Security', mediumLabel: 'Tech & Sec', shortLabel: 'TS' },
-                      { id: 'support', label: 'Operation & Support', mediumLabel: 'Ops & Support', shortLabel: 'OS' },
-                    ].map((tab) => (
-                      <button
-                        key={tab.id}
-                        onClick={() => setMapTab(tab.id)}
-                        className={`pb-2 transition-all cursor-pointer relative font-bold tracking-normal sm:tracking-wider text-center ${
-                          mapTab === tab.id
-                            ? "text-white font-black"
-                            : "text-white/60 hover:text-white/80"
-                        }`}
-                      >
-                        <span className="hidden xl:inline">{tab.label}</span>
-                        <span className="hidden sm:inline xl:hidden">{tab.mediumLabel}</span>
-                        <span className="sm:hidden">{tab.shortLabel}</span>
-                        {mapTab === tab.id && (
-                          <span className="absolute bottom-[-17px] left-0 right-0 h-0.5 bg-white rounded-full"></span>
-                        )}
-                      </button>
-                    ))}
+                  {/* Tasks Header */}
+                  <div className="relative flex items-center justify-center mb-3 pb-3 border-b border-white/10 flex-shrink-0">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-sm font-black text-white uppercase tracking-[0.2em]">Tasks</span>
+                      <span className="text-[9px] bg-sky-500/20 text-sky-300 font-extrabold px-2 py-0.5 rounded-full border border-sky-400/20">
+                        {getAIGeneratedTasks(selectedIngestFile).length}
+                      </span>
+                    </div>
+                    <span className="absolute right-0 text-[9px] text-white/40 font-semibold uppercase tracking-wider">AI Generated</span>
                   </div>
 
-                  {/* Vertical Checkbox stack */}
-                  <div className="flex-grow space-y-4">
-                    {mapTab === 'banking' && (
-                      (checkedDirectives['risk'] || checkedDirectives['geospatial'] || checkedDirectives['audit']) ? (
-                        <>
-                          {checkedDirectives['risk'] && renderTaskCard('bank1', 'Risk Assessment v1.2', 'Comprehensive verification of retail account identification standards.')}
-                          {checkedDirectives['geospatial'] && renderTaskCard('bank2', 'Geospatial Data Synthesis', 'Geospatial analysis of irregular transaction clusters.')}
-                          {checkedDirectives['audit'] && renderTaskCard('bank3', 'Compliance Audit Trace', 'Algorithmic transparency verification for SME loans.')}
-                        </>
-                      ) : renderEmptyPlaceholder()
-                    )}
-                    {mapTab === 'finance' && (
-                      (checkedDirectives['audit'] || checkedDirectives['ops']) ? (
-                        <>
-                          {checkedDirectives['audit'] && renderTaskCard('fin1', 'Credit Risk Classifier v2.1', 'Autonomous evaluation of digital lending profiles.')}
-                          {checkedDirectives['ops'] && renderTaskCard('fin2', 'Collateral Valuation Audit', 'Verifying asset valuation integrity protocols.')}
-                        </>
-                      ) : renderEmptyPlaceholder()
-                    )}
-                    {mapTab === 'compliance' && (
-                      (checkedDirectives['policy'] || checkedDirectives['geospatial']) ? (
-                        <>
-                          {checkedDirectives['policy'] && renderTaskCard('comp1', 'DPDP Compliance Matrix', 'Validation against primary data protection laws.')}
-                          {checkedDirectives['geospatial'] && renderTaskCard('comp2', 'Cross-Border Flow Ledger', 'Tracing international data egress tunnels.')}
-                        </>
-                      ) : renderEmptyPlaceholder()
-                    )}
-                    {mapTab === 'security' && (
-                      (checkedDirectives['system']) ? (
-                        <>
-                          {checkedDirectives['system'] && renderTaskCard('sec1', 'Core API Threat Shield', 'Active vulnerability analysis of banking endpoints.')}
-                          {checkedDirectives['system'] && renderTaskCard('sec2', 'Tokenized Vault Scan', 'Verifying cryptographic data shielding standards.')}
-                        </>
-                      ) : renderEmptyPlaceholder()
-                    )}
-                    {mapTab === 'support' && (
-                      (checkedDirectives['ops']) ? (
-                        <>
-                          {checkedDirectives['ops'] && renderTaskCard('sup1', 'Incident Report Dispatcher', 'Autonomous alert synchronization for help desks.')}
-                          {checkedDirectives['ops'] && renderTaskCard('sup2', 'System Load Evaluator', 'Evaluating latency spikes during peak transaction sessions.')}
-                        </>
-                      ) : renderEmptyPlaceholder()
-                    )}
+                  {/* Vertical Checkbox stack — scrollable */}
+                  <div className="space-y-3 overflow-y-auto pr-1 custom-scrollbar flex-grow" style={{ maxHeight: '310px' }}>
+                    {isAiScanning ? (
+                      // Scanning indicator skeleton
+                      <div className="flex flex-col items-center justify-center h-full py-16 text-center space-y-4">
+                        <RefreshCw className="h-10 w-10 text-white/50 animate-spin" />
+                        <div className="space-y-1">
+                          <p className="text-xs font-black text-white/90">AURIS Deep Compliance Parser active</p>
+                          <p className="text-[10px] text-white/60 font-semibold">Simulating semantic analysis and compliance mapping on "{selectedIngestFile}"...</p>
+                        </div>
+                      </div>
+                    ) : (() => {
+                      const allTasks = getAIGeneratedTasks(selectedIngestFile);
+                      
+                      if (allTasks.length === 0) {
+                        return (
+                          <div className="flex flex-col items-center justify-center py-16 text-center space-y-3">
+                            <Shield className="h-10 w-10 text-white/20" />
+                            <div className="space-y-1">
+                              <p className="text-xs font-black text-white/80">No guidelines generated</p>
+                              <p className="text-[10px] text-white/50 font-semibold px-4">
+                                {selectedIngestFile 
+                                  ? `This document's compliance vector does not contain any generated tasks.`
+                                  : 'Select a document in the Ingestion list to generate regulatory tasks.'}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="space-y-4 text-left">
+                          {allTasks.map(t => (
+                            <div key={t.id} className="bg-white/5 border border-white/10 hover:bg-white/10 transition-all rounded-xl p-4.5 space-y-2.5 relative group">
+                              <div className="flex justify-between items-start">
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-[9px] bg-rose-500/20 text-rose-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                                      {t.priority}
+                                    </span>
+                                    <span className="text-[9px] bg-[#0ea5e9]/20 text-[#38bdf8] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-[#0ea5e9]/10">
+                                      {t.department}
+                                    </span>
+                                    {assignedTasks.some(at => at.id === t.id) && (
+                                      <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                                        <CheckCircle2 className="h-3 w-3" /> Submitted
+                                      </span>
+                                    )}
+                                  </div>
+                                  <h4 className="text-sm font-black text-white pt-1">{t.title}</h4>
+                                </div>
+                                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">AI Generated</span>
+                              </div>
+                              <p className="text-xs text-white/70 font-semibold leading-relaxed">
+                                {t.desc}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                 </div>
 
               </div>
 
-              {/* Bottom Centered Button Inside Card */}
-              <div className="w-full flex justify-center pt-5 border-t border-slate-200/20 mt-2 relative z-10">
+              {/* Submit Button — Outside the card, below the grid */}
+              <div className="w-full flex justify-center pt-6">
                 <button
-                  onClick={handleSendAssignment}
-                  className="px-12 py-3 bg-[#003262] hover:bg-black text-white text-xs font-bold rounded-lg shadow-lg transition-all active:scale-95 flex items-center gap-2 border border-slate-800 cursor-pointer"
+                  onClick={() => {
+                    if (isAiScanning) {
+                      setToast("Please wait for AI Ingestion to complete.");
+                      return;
+                    }
+                    const newTasks = getAIGeneratedTasks(selectedIngestFile);
+                    if (newTasks.length === 0) {
+                      setToast("No tasks available to assign.");
+                      return;
+                    }
+                    setAssignedTasks(prev => {
+                      const filteredPrev = prev.filter(t => !newTasks.some(nt => nt.id === t.id));
+                      const updated = [...filteredPrev, ...newTasks];
+                      localStorage.setItem('auris_assigned_tasks', JSON.stringify(updated));
+                      return updated;
+                    });
+                    setToast(`Successfully assigned ${newTasks.length} tasks to dynamic oversight desks! 💾`);
+                  }}
+                  className="px-14 py-3.5 bg-[#003262] hover:bg-[#0ea5e9] text-white text-xs font-bold rounded-xl shadow-xl transition-all duration-200 active:scale-95 border border-slate-700 hover:border-sky-400 cursor-pointer tracking-wider uppercase"
                 >
-                  Submit To Assignments
+                  Submit to Departments
                 </button>
               </div>
 
@@ -1272,40 +1527,17 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
             </div>
 
-            {/* The beautiful landing page footer! */}
-            <footer className="w-full bg-slate-900 text-white py-12 border-t-4 border-orange-500 mt-12 z-20 text-center">
-              <div className="max-w-7xl mx-auto px-6 space-y-8">
-                {/* Main Footer Links */}
-                <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-xs font-bold text-gray-300 border-b border-white/10 pb-8 uppercase tracking-widest">
-                  <button onClick={() => setToast("About Us page linked.")} className="hover:text-white transition-colors">About Us</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Help documentation linked.")} className="hover:text-white transition-colors">Help</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Site map opened.")} className="hover:text-white transition-colors">Sitemap</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Website Policies and Terms linked.")} className="hover:text-white transition-colors">Website Policies</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Loading feedback desk...")} className="hover:text-white transition-colors">Feedback</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Contact Information opened.")} className="hover:text-white transition-colors">Contact Us</button>
-                </div>
-                {/* Copyright details */}
-                <div className="flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4 text-left">
-                  <div className="text-center md:text-left space-y-1">
-                    <p className="leading-relaxed">
-                      © Developed and hosted by <span className="text-white font-semibold">National Informatics Centre</span>,
-                    </p>
-                    <p className="leading-relaxed">
-                      Ministry of Law &amp; Justice, Information Technology, <span className="text-white font-bold">Government of India</span>
-                    </p>
-                  </div>
-                  <div className="text-center md:text-right font-bold space-y-1">
-                    <p>Last Updated: <span className="text-blue-400">May 27, 2026</span></p>
-                    <p className="text-[10px] text-slate-500 font-semibold uppercase">AURIS Portal version 2.4.2</p>
-                  </div>
-                </div>
-              </div>
-            </footer>
+          {/* The beautiful landing page footer! */}
+          <footer className="w-full bg-[#0b1329] text-left py-6 border-t-4 border-[#f57c00] mt-auto z-20">
+            <div className="w-full px-12 text-[11px] leading-relaxed text-slate-400 font-medium">
+              <p>
+                © Developed and hosted by <strong className="text-white font-bold">National Informatics Centre</strong>,
+              </p>
+              <p>
+                Ministry of Law &amp; Justice, Information Technology, <strong className="text-white font-bold">Government of India</strong>
+              </p>
+            </div>
+          </footer>
 
           </div>
         )}
@@ -1348,37 +1580,14 @@ Analytical user metadata and training weights may be relayed to globally distrib
             </div>
 
             {/* The beautiful landing page footer! */}
-            <footer className="w-full bg-slate-900 text-white py-12 border-t-4 border-orange-500 mt-12 z-20 text-center">
-              <div className="max-w-7xl mx-auto px-6 space-y-8">
-                {/* Main Footer Links */}
-                <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-xs font-bold text-gray-300 border-b border-white/10 pb-8 uppercase tracking-widest">
-                  <button onClick={() => setToast("About Us page linked.")} className="hover:text-white transition-colors">About Us</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Help documentation linked.")} className="hover:text-white transition-colors">Help</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Site map opened.")} className="hover:text-white transition-colors">Sitemap</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Website Policies and Terms linked.")} className="hover:text-white transition-colors">Website Policies</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Loading feedback desk...")} className="hover:text-white transition-colors">Feedback</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Contact Information opened.")} className="hover:text-white transition-colors">Contact Us</button>
-                </div>
-                {/* Copyright details */}
-                <div className="flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4 text-left">
-                  <div className="text-center md:text-left space-y-1">
-                    <p className="leading-relaxed">
-                      © Developed and hosted by <span className="text-white font-semibold">National Informatics Centre</span>,
-                    </p>
-                    <p className="leading-relaxed">
-                      Ministry of Law &amp; Justice, Information Technology, <span className="text-white font-bold">Government of India</span>
-                    </p>
-                  </div>
-                  <div className="text-center md:text-right font-bold space-y-1">
-                    <p>Last Updated: <span className="text-blue-400">May 27, 2026</span></p>
-                    <p className="text-[10px] text-slate-500 font-semibold uppercase">AURIS Portal version 2.4.2</p>
-                  </div>
-                </div>
+            <footer className="w-full bg-[#0b1329] text-left py-6 border-t-4 border-[#f57c00] mt-auto z-20">
+              <div className="w-full px-12 text-[11px] leading-relaxed text-slate-400 font-medium">
+                <p>
+                  © Developed and hosted by <strong className="text-white font-bold">National Informatics Centre</strong>,
+                </p>
+                <p>
+                  Ministry of Law &amp; Justice, Information Technology, <strong className="text-white font-bold">Government of India</strong>
+                </p>
               </div>
             </footer>
 
@@ -1387,564 +1596,202 @@ Analytical user metadata and training weights may be relayed to globally distrib
 
         {/* Assignments view */}
         {activeSidebar === 'assignments' && (
-          <div className="relative z-10 flex-grow flex flex-col w-full h-full overflow-y-auto custom-scrollbar">
-            <div className="flex-grow flex flex-col items-start justify-start p-12 max-w-7xl mx-auto w-full text-left space-y-8 relative z-10 min-h-[calc(100vh-80px)]">
+          <div className="relative z-10 flex-grow flex flex-col w-full h-full overflow-y-auto custom-scrollbar bg-[#f1f3f4]">
+            <div className="flex-grow flex flex-col items-start justify-start p-6 md:px-12 md:py-6 w-full space-y-5 relative z-10 min-h-[calc(100vh-80px)]">
 
-              {/* Header */}
-              <div className="space-y-2 text-left w-full">
+              {/* Left-aligned Header */}
+              <div className="text-left space-y-3.5 w-full">
                 <h1 className="text-4xl md:text-[44px] font-black text-slate-900 tracking-tight leading-none font-public">
-                  {selectedAssignmentTab === 'banking' && (currentLanguage === 'hi' ? 'ग्राहक बैंकिंग ऑडिट' : 'Customer Banking Audits')}
-                  {selectedAssignmentTab === 'finance' && (currentLanguage === 'hi' ? 'ऋण और वित्त ऑडिट' : 'Loans & Finance Audits')}
-                  {selectedAssignmentTab === 'security' && (currentLanguage === 'hi' ? 'प्रौद्योगिकी और सुरक्षा ऑडिट' : 'Technology & Security Audits')}
-                  {selectedAssignmentTab === 'support' && (currentLanguage === 'hi' ? 'संचालन और सहायता ऑडिट' : 'Operation & Support Audits')}
-                  {selectedAssignmentTab === 'main' && (currentLanguage === 'hi' ? 'असाइनमेंट > मुख्य' : 'Assignments > Main')}
+                  {selectedAssignmentTab === 'main' 
+                    ? (currentLanguage === 'hi' ? 'विभाग > मुख्य' : 'Department > Main') 
+                    : (currentLanguage === 'hi' 
+                        ? `विभाग > ${selectedAssignmentTab === 'banking' || selectedAssignmentTab.toLowerCase().includes('retail') ? 'रिटेल बैंकिंग' : selectedAssignmentTab === 'finance' ? 'ऋण और वित्त' : selectedAssignmentTab === 'security' ? 'प्रौद्योगिकी और सुरक्षा' : selectedAssignmentTab === 'support' ? 'संचालन और सहायता' : selectedAssignmentTab.replace(/\s*Department\s*/gi, '')}` 
+                        : `Department > ${selectedAssignmentTab.replace(/\s*Department\s*/gi, '')}`)}
                 </h1>
-                <p className="text-sm font-semibold text-[#44474e] max-w-2xl leading-relaxed">
-                  {selectedAssignmentTab === 'banking' && (
-                    currentLanguage === 'hi'
-                      ? 'खुदरा खाता पहचान मानकों, डिजिटल केवाईसी अनुपालन पाइपलाइनों और स्वचालित एएमएल/सीएफटी ऑडिट ट्रेल्स के लिए संप्रभु सत्यापन बही।'
-                      : 'Sovereign verification ledger for retail account identification standards, digital KYC compliance pipelines, and automated AML/CFT audit traces.'
-                  )}
-                  {selectedAssignmentTab === 'finance' && (
-                    currentLanguage === 'hi'
-                      ? 'डिजिटल ऋण प्रोफाइल, क्रेडिट जोखिम वर्गीकरण अनुपालन, और संप्रभु ऋण नीतियों के खिलाफ संपत्ति संपार्श्विक मूल्यांकन अखंडता का ऑडिट।'
-                      : 'Audit of digital lending profiles, credit risk classification compliance, and asset collateral valuation integrity against sovereign lending frameworks.'
-                  )}
-                  {selectedAssignmentTab === 'security' && (
-                    currentLanguage === 'hi'
-                      ? 'कोर बैंकिंग एपीआई सुरक्षा थ्रेट शील्ड, एन्क्रिप्टेड डेटा वाल्ट मानकों, और संप्रभु भू-बाड़ लगाने के डेटा स्थानीयकरण नियमों का सत्यापन।'
-                      : 'Validation of core banking API security threat shields, encrypted data vault standards, and sovereign geofencing data localization regulations.'
-                  )}
-                  {selectedAssignmentTab === 'support' && (
-                    currentLanguage === 'hi'
-                      ? 'मदद डेस्क प्रतिक्रिया एसएलए, कंप्यूट सर्वर लोड थ्रेशोल्ड और दैनिक बैकअप डेटा अखंडता सिंक्रनाइज़ेशन चक्रों की निगरानी।'
-                      : 'Monitoring of help desk response SLAs, compute server load thresholds, and daily backup data integrity synchronization cycles.'
-                  )}
-                  {selectedAssignmentTab === 'main' && (
-                    currentLanguage === 'hi'
-                      ? 'स्वायत्त जोखिम मूल्यांकन और कानूनी संरेखण सत्यापन के लिए संप्रभु नीति दस्तावेज या आंतरिक निर्देश अपलोड करें।'
-                      : 'Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.'
-                  )}
+                <p className="text-slate-600 text-sm md:text-[15px] font-semibold leading-relaxed max-w-3xl">
+                  Upload sovereign policy documents or internal directives for autonomous risk evaluation and legal alignment verification.
                 </p>
               </div>
 
-              {/* Cards Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-                {selectedAssignmentTab === 'banking' && (
-                  <>
-                    {/* Card 1 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-emerald-50 text-emerald-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Active</span>
-                        <span className="text-[10px] bg-orange-100 text-orange-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">High Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Retail Account Verification v1.2</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Continuous algorithmic monitoring of retail deposits, verifying alignment with RBI core KYC mandates.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-650">
-                        <div className="flex justify-between">
-                          <span>Accounts Audited</span>
-                          <span className="text-slate-900">12,450</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Friction Alerts</span>
-                          <span className="text-orange-600">3 Deficit Flags</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>65%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-emerald-500 h-full rounded-full" style={{ width: '65%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card 2 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-teal-50 text-teal-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Compliant</span>
-                        <span className="text-[10px] bg-slate-100 text-slate-650 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Medium Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Digital KYC Consent Pipeline</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Cryptographic validation of user consent tokens to block unauthorized cross-border metadata egress.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-650">
-                        <div className="flex justify-between">
-                          <span>Tokens Verified</span>
-                          <span className="text-slate-900">185,200</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Infractions raised</span>
-                          <span className="text-emerald-600">0 Infractions</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>100%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-teal-500 h-full rounded-full" style={{ width: '100%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Card 3 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-amber-50 text-amber-855 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Investigating</span>
-                        <span className="text-[10px] bg-rose-100 text-rose-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Critical Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">High-Value Transaction Monitor</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Real-time trace of high-volume financial movements, scanning for anomalous velocity and AML infractions.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-650">
-                        <div className="flex justify-between">
-                          <span>Transfers Traced</span>
-                          <span className="text-slate-900">512 Transfers</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>SARs Dispatched</span>
-                          <span className="text-rose-600">1 Activity Alert</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>90%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-amber-500 h-full rounded-full" style={{ width: '90%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {selectedAssignmentTab === 'finance' && (
-                  <>
-                    {/* Finance Card 1 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-emerald-50 text-emerald-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Active</span>
-                        <span className="text-[10px] bg-orange-100 text-orange-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">High Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Credit Risk Classifier v2.1</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Autonomous evaluation of digital lending profiles, automated income validation, and credit underwriting compliance.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-650">
-                        <div className="flex justify-between">
-                          <span>Profiles Audited</span>
-                          <span className="text-slate-900">8,340</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Friction Alerts</span>
-                          <span className="text-orange-600">1 Deficit Flag</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>80%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-emerald-500 h-full rounded-full" style={{ width: '80%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Finance Card 2 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-teal-50 text-teal-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Compliant</span>
-                        <span className="text-[10px] bg-slate-100 text-slate-655 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Low Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Collateral Valuation Audit</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Verifying asset valuation integrity protocols and digital collateral tracking ledger systems.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-650">
-                        <div className="flex justify-between">
-                          <span>Assets Verified</span>
-                          <span className="text-slate-900">1,200 Assets</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Infractions raised</span>
-                          <span className="text-emerald-600">0 Infractions</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>100%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-teal-500 h-full rounded-full" style={{ width: '100%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Finance Card 3 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-amber-50 text-amber-855 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Investigating</span>
-                        <span className="text-[10px] bg-slate-100 text-slate-655 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Medium Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Lending Compliance Check</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Dynamic auditing of credit terms and interest rate disclosure compliance under fair lending guidelines.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-655">
-                        <div className="flex justify-between">
-                          <span>Contracts Audited</span>
-                          <span className="text-slate-900">3,450 Contracts</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Friction Alerts</span>
-                          <span className="text-amber-600">2 Minor Flags</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>45%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-amber-500 h-full rounded-full" style={{ width: '45%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {selectedAssignmentTab === 'security' && (
-                  <>
-                    {/* Security Card 1 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-emerald-50 text-emerald-855 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Active</span>
-                        <span className="text-[10px] bg-rose-100 text-rose-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Critical Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Core API Threat Shield</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Active vulnerability analysis and access token security monitoring of core banking APIs.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-655">
-                        <div className="flex justify-between">
-                          <span>Endpoints Monitored</span>
-                          <span className="text-slate-900">86 APIs</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Threat Alerts</span>
-                          <span className="text-emerald-600">0 Threat Vectors</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>95%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-emerald-500 h-full rounded-full" style={{ width: '95%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Security Card 2 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-teal-50 text-teal-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Compliant</span>
-                        <span className="text-[10px] bg-orange-100 text-orange-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">High Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Tokenized Vault Scan</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Verifying cryptographic data shielding standards and sovereign keys management protocols.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-655">
-                        <div className="flex justify-between">
-                          <span>Vaults Audited</span>
-                          <span className="text-slate-900">14 Secure Vaults</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Infractions raised</span>
-                          <span className="text-emerald-600">0 Infractions</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>100%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-teal-500 h-full rounded-full" style={{ width: '100%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Security Card 3 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-amber-50 text-amber-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Investigating</span>
-                        <span className="text-[10px] bg-orange-100 text-orange-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">High Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Cross-Border Flow Ledger</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Real-time analysis of international data egress tunnels to confirm domestic geofencing alignment.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-655">
-                        <div className="flex justify-between">
-                          <span>Tunnels Analyzed</span>
-                          <span className="text-slate-900">4 Active Links</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Friction Alerts</span>
-                          <span className="text-orange-650">1 Data Egress Flag</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>70%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-amber-500 h-full rounded-full" style={{ width: '70%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {selectedAssignmentTab === 'support' && (
-                  <>
-                    {/* Support Card 1 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-emerald-50 text-emerald-855 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Active</span>
-                        <span className="text-[10px] bg-slate-100 text-slate-650 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Medium Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Incident Report Dispatcher</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Autonomous tracking and resolution latency auditing of critical operations help desks.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-655">
-                        <div className="flex justify-between">
-                          <span>Incidents Tracked</span>
-                          <span className="text-slate-900">3,120</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>SLA Violations</span>
-                          <span className="text-orange-600">4 SLA Warnings</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>85%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-emerald-500 h-full rounded-full" style={{ width: '85%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Support Card 2 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-teal-50 text-teal-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Compliant</span>
-                        <span className="text-[10px] bg-slate-100 text-slate-650 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Low Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">System Load Evaluator</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Evaluating compute threshold and memory latency spikes during peak transaction sessions.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-655">
-                        <div className="flex justify-between">
-                          <span>Servers Audited</span>
-                          <span className="text-slate-900">120 Node Clusters</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Infractions raised</span>
-                          <span className="text-emerald-600">0 Infractions</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>100%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-teal-500 h-full rounded-full" style={{ width: '100%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Support Card 3 */}
-                    <div className="bg-white border border-[#c4c6cf] rounded-2xl p-6 text-left space-y-4 hover:shadow-lg transition-all duration-300">
-                      <div className="flex justify-between items-start">
-                        <span className="text-[10px] bg-amber-50 text-amber-850 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Investigating</span>
-                        <span className="text-[10px] bg-slate-100 text-slate-655 font-extrabold px-2.5 py-1 rounded-full uppercase tracking-wider">Medium Priority</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="text-lg font-black text-[#003262]">Operational Security Scan</h4>
-                        <p className="text-xs text-slate-500 font-semibold leading-relaxed">Routine integrity analysis of system log generation and backup snapshot synchronization loops.</p>
-                      </div>
-                      <div className="border-t border-slate-100 pt-3 space-y-2 text-[11px] font-bold text-slate-655">
-                        <div className="flex justify-between">
-                          <span>Backups Verified</span>
-                          <span className="text-slate-900">360 Snapshots</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Friction Alerts</span>
-                          <span className="text-emerald-600">0 Sync Errors</span>
-                        </div>
-                      </div>
-                      <div className="space-y-1.5 pt-1">
-                        <div className="flex justify-between text-[11px] font-bold text-slate-600">
-                          <span>Progress</span>
-                          <span>50%</span>
-                        </div>
-                        <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                          <div className="bg-amber-500 h-full rounded-full" style={{ width: '50%' }}></div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {selectedAssignmentTab === 'main' && (
-                  <div className="col-span-full w-full bg-[#1c7093] rounded-2xl p-8 shadow-2xl border border-white/10 text-white flex flex-col space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-                    {/* Header Row */}
-                    <div className="flex justify-between items-center text-xs font-black tracking-widest text-white/95 select-none uppercase px-2">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4.5 w-4.5 text-[#FDB515]" />
-                        <span>{currentLanguage === 'hi' ? 'कार्य' : 'Task'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Folder className="h-4.5 w-4.5 text-[#FDB515]" />
-                        <span>{currentLanguage === 'hi' ? 'विभाग का नाम' : 'Department Name'}</span>
-                      </div>
-                    </div>
-
-                    {/* Inner Container */}
-                    <div className="bg-[#124d67] rounded-2xl p-6 min-h-[480px] flex flex-col space-y-6">
-                      {/* Task Row 1 */}
-                      <div className="bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-300 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-inner">
-                        <div className="space-y-2 text-left max-w-xl">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[10px] bg-rose-500/20 text-rose-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Active</span>
-                            <span className="text-[10px] bg-orange-500/20 text-orange-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">High Priority</span>
-                          </div>
-                          <h4 className="text-lg font-black text-white">{currentLanguage === 'hi' ? 'कोर बही अखंडता जांच' : 'Core Ledger Integrity Check'}</h4>
-                          <p className="text-xs text-white/70 font-semibold leading-relaxed">
-                            {currentLanguage === 'hi'
-                              ? 'मुख्य लेखा बही और संप्रभु वित्तीय अनुपालन वैक्टर की निरंतर ऑडिट निगरानी।'
-                              : 'Continuous audit monitoring of the main accounting ledger and sovereign financial compliance vectors.'}
-                          </p>
-                          <div className="flex items-center gap-4 text-[11px] font-bold text-white/60 pt-1">
-                            <span>{currentLanguage === 'hi' ? 'नोड्स जाँचे गए: 8,530' : 'Ledger Nodes Checked: 8,530'}</span>
-                            <span className="text-emerald-300">RBI Standard Verified</span>
-                          </div>
-                          <div className="space-y-1.5 pt-1.5 max-w-xs">
-                            <div className="flex justify-between text-[10px] font-extrabold text-white/70">
-                              <span>{currentLanguage === 'hi' ? 'प्रगति' : 'Progress'}</span>
-                              <span>92%</span>
-                            </div>
-                            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                              <div className="bg-emerald-450 h-full rounded-full" style={{ width: '92%', backgroundColor: '#34d399' }}></div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex-shrink-0 text-left sm:text-right">
-                          <span className="inline-flex items-center gap-1.5 text-xs font-black tracking-wider uppercase bg-[#1a6b8f] px-4 py-2 rounded-xl text-white border border-white/10 shadow-sm">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                            {currentLanguage === 'hi' ? 'प्रौद्योगिकी और सुरक्षा' : 'Technology & Security'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Task Row 2 */}
-                      <div className="bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-300 rounded-xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-inner">
-                        <div className="space-y-2 text-left max-w-xl">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Compliant</span>
-                            <span className="text-[10px] bg-slate-500/20 text-slate-300 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Medium Priority</span>
-                          </div>
-                          <h4 className="text-lg font-black text-white">{currentLanguage === 'hi' ? 'संप्रभु नियामक सिंक' : 'Sovereign Regulatory Sync'}</h4>
-                          <p className="text-xs text-white/70 font-semibold leading-relaxed">
-                            {currentLanguage === 'hi'
-                              ? 'मुख्य संचालन में आरबीआई के परिपत्रों और नियामक निर्देशों के साथ वास्तविक समय सिंक्रनाइज़ेशन सुनिश्चित करना।'
-                              : 'Ensuring real-time synchronization with RBI circulars and regulatory directives across main operations.'}
-                          </p>
-                          <div className="flex items-center gap-4 text-[11px] font-bold text-white/60 pt-1">
-                            <span>{currentLanguage === 'hi' ? 'सिंक अखंडता: 99.98%' : 'Sync Integrity: 99.98%'}</span>
-                            <span className="text-emerald-300">0.4s Delay</span>
-                          </div>
-                          <div className="space-y-1.5 pt-1.5 max-w-xs">
-                            <div className="flex justify-between text-[10px] font-extrabold text-white/70">
-                              <span>{currentLanguage === 'hi' ? 'प्रगति' : 'Progress'}</span>
-                              <span>100%</span>
-                            </div>
-                            <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                              <div className="bg-teal-450 h-full rounded-full" style={{ width: '100%', backgroundColor: '#2dd4bf' }}></div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex-shrink-0 text-left sm:text-right">
-                          <span className="inline-flex items-center gap-1.5 text-xs font-black tracking-wider uppercase bg-[#1a6b8f] px-4 py-2 rounded-xl text-white border border-white/10 shadow-sm">
-                            <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
-                            {currentLanguage === 'hi' ? 'जोखिम और अनुपालन' : 'Risk & Compliance'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+              {/* Large Centered Blue Card */}
+              <div className="w-full tasks-gradient-box rounded-3xl p-6 sm:p-10 shadow-2xl relative z-10 flex flex-col space-y-8 border border-white/10 text-white min-h-[480px]">
+                
+                {/* Centered Capsule Header */}
+                <div className="w-full max-w-[420px] mx-auto bg-white/10 backdrop-blur-md rounded-2xl p-4 flex justify-between items-center border border-white/20 select-none shadow-sm">
+                  {/* Left List Icon inside square outline */}
+                  <div className="w-8 h-8 rounded-lg border border-white/25 flex items-center justify-center bg-transparent">
+                    <ClipboardList className="h-4.5 w-4.5 text-white" />
                   </div>
-                )}
+                  
+                  {/* Center Text */}
+                  <span className="text-sm font-black tracking-widest text-white uppercase text-center flex-grow">
+                    TASKS
+                  </span>
+                  
+                  {/* Right Up-Arrow Caret */}
+                  <ChevronUp className="h-5 w-5 text-white cursor-pointer" />
+                </div>
+
+                {/* Dynamic/Preset Tasks list inside the deep blue container */}
+                <div className="w-full max-w-5xl mx-auto space-y-3.5 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar flex flex-col">
+                  {(() => {
+                    const deptCat = getDeptCategory(selectedAssignmentTab);
+                    const filtered = assignedTasks.filter(t => t.department === deptCat);
+                    
+                    if (selectedAssignmentTab === 'main') {
+                      // Render default main system-level tasks inside the deep blue container
+                      return (
+                        <div className="grid grid-cols-1 gap-3.5 text-left w-full">
+                          {/* Task Row 1 */}
+                          <div className="bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-300 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 shadow-inner">
+                            <div className="space-y-1.5 text-left max-w-xl">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="text-[9px] bg-rose-500/20 text-rose-300 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Active</span>
+                                <span className="text-[9px] bg-orange-500/20 text-orange-300 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">High Priority</span>
+                              </div>
+                              <h4 className="text-[15px] font-bold text-white leading-snug">{currentLanguage === 'hi' ? 'कोर बही अखंडता जांच' : 'Core Ledger Integrity Check'}</h4>
+                              <p className="text-[11px] text-white/70 font-semibold leading-relaxed">
+                                {currentLanguage === 'hi'
+                                  ? 'मुख्य लेखा बही और संप्रभु वित्तीय अनुपालन वैक्टर की निरंतर ऑडिट निगरानी।'
+                                  : 'Continuous audit monitoring of the main accounting ledger and sovereign financial compliance vectors.'}
+                              </p>
+                              <div className="flex items-center gap-4 text-[10px] font-bold text-white/60 pt-0.5">
+                                <span>{currentLanguage === 'hi' ? 'नोड्स जाँचे गए: 8,530' : 'Ledger Nodes Checked: 8,530'}</span>
+                                <span className="text-emerald-300 font-bold ml-2">✓ Verified</span>
+                              </div>
+                              <div className="space-y-1.5 pt-1.5 max-w-xs">
+                                <div className="flex justify-between text-[10px] font-extrabold text-white/70">
+                                  <span>{currentLanguage === 'hi' ? 'प्रगति' : 'Progress'}</span>
+                                  <span>92%</span>
+                                </div>
+                                <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                  <div className="bg-emerald-450 h-full rounded-full" style={{ width: '92%', backgroundColor: '#34d399' }}></div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0 text-left sm:text-right">
+                              <span className="inline-flex items-center gap-1.5 text-xs font-black tracking-wider uppercase bg-[#1a6b8f] px-4 py-2 rounded-xl text-white border border-white/10 shadow-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                {currentLanguage === 'hi' ? 'प्रौद्योगिकी और सुरक्षा' : 'Technology & Security'}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Task Row 2 */}
+                          <div className="bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-300 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 shadow-inner">
+                            <div className="space-y-1.5 text-left max-w-xl">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Compliant</span>
+                                <span className="text-[9px] bg-slate-500/20 text-slate-300 font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider">Medium Priority</span>
+                              </div>
+                              <h4 className="text-[15px] font-bold text-white leading-snug">{currentLanguage === 'hi' ? 'संप्रभु नियामक सिंक' : 'Sovereign Regulatory Sync'}</h4>
+                              <p className="text-[11px] text-white/70 font-semibold leading-relaxed">
+                                {currentLanguage === 'hi'
+                                  ? 'मुख्य संचालन में आरबीआई के परिपत्रों और नियामक निर्देशों के साथ वास्तविक समय सिंक्रनाइज़ेशन सुनिश्चित करना।'
+                                  : 'Ensuring real-time synchronization with RBI circulars and regulatory directives across main operations.'}
+                              </p>
+                              <div className="flex items-center gap-4 text-[10px] font-bold text-white/60 pt-0.5">
+                                <span>{currentLanguage === 'hi' ? 'सिंक अखंडता: 99.98%' : 'Sync Integrity: 99.98%'}</span>
+                                <span className="text-emerald-300">0.4s Delay</span>
+                              </div>
+                              <div className="space-y-1.5 pt-1.5 max-w-xs">
+                                <div className="flex justify-between text-[10px] font-extrabold text-white/70">
+                                  <span>{currentLanguage === 'hi' ? 'प्रगति' : 'Progress'}</span>
+                                  <span>100%</span>
+                                </div>
+                                <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                  <div className="bg-teal-450 h-full rounded-full" style={{ width: '100%', backgroundColor: '#2dd4bf' }}></div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0 text-left sm:text-right">
+                              <span className="inline-flex items-center gap-1.5 text-xs font-black tracking-wider uppercase bg-[#1a6b8f] px-4 py-2 rounded-xl text-white border border-white/10 shadow-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                                {currentLanguage === 'hi' ? 'जोखिम और अनुपालन' : 'Risk & Compliance'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    if (filtered.length === 0) {
+                      return (
+                        <div className="flex flex-col items-center justify-center py-16 text-center space-y-4 bg-white/5 rounded-2xl border border-white/10 w-full">
+                          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center text-white/40 border border-white/10 shadow-inner">
+                            <ClipboardList className="h-8 w-8" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <h5 className="text-base font-black text-white">{currentLanguage === 'hi' ? 'कोई कार्य निर्दिष्ट नहीं है' : 'No Tasks Assigned'}</h5>
+                            <p className="text-xs text-white/60 font-semibold max-w-md mx-auto leading-relaxed">
+                              {currentLanguage === 'hi'
+                                ? 'इस विभाग को अभी तक कोई स्वायत्त अनुपालन कार्य नहीं भेजा गया है।'
+                                : 'No compliance or monitoring tasks have been assigned to this desk yet. Ingest a document inside Map Generator to assign tasks to this department.'}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="grid grid-cols-1 gap-3.5 text-left w-full">
+                        {filtered.map((task) => (
+                          <div key={task.id} className="bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all duration-300 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 shadow-inner">
+                            <div className="space-y-1.5 text-left max-w-xl">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className={`text-[9px] ${task.status === 'Compliant' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'} font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider`}>
+                                  {task.status}
+                                </span>
+                                <span className={`text-[9px] ${task.priority.includes('Critical') ? 'bg-rose-500/20 text-rose-300' : 'bg-orange-500/20 text-orange-300'} font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider`}>
+                                  {task.priority}
+                                </span>
+                              </div>
+                              <h4 className="text-[15px] font-bold text-white leading-snug">{task.title}</h4>
+                              <p className="text-[11px] text-white/70 font-semibold leading-relaxed">
+                                {task.desc}
+                              </p>
+                              <div className="flex items-center gap-4 text-[10px] font-bold text-white/60 pt-0.5">
+                                <span>Ingested: {task.fileName}</span>
+                                <span className="text-emerald-300 font-bold ml-2">✓ Verified</span>
+                              </div>
+                              <div className="space-y-1.5 pt-1.5 max-w-xs">
+                                <div className="flex justify-between text-[10px] font-extrabold text-white/70">
+                                  <span>Progress</span>
+                                  <span>{task.progress}%</span>
+                                </div>
+                                <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                  <div className="bg-emerald-450 h-full rounded-full" style={{ width: `${task.progress}%`, backgroundColor: '#34d399' }}></div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex-shrink-0 text-left sm:text-right">
+                              <span className="inline-flex items-center gap-1.5 text-xs font-black tracking-wider uppercase bg-[#1a6b8f] px-4 py-2 rounded-xl text-white border border-white/10 shadow-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                {selectedAssignmentTab.replace(/\s*Department\s*/gi, '')}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+
               </div>
+
+              {/* Reusable landing page footer */}
+              <footer className="w-full bg-[#0b1329] text-left py-6 border-t-4 border-[#f57c00] mt-auto z-20">
+                <div className="w-full px-12 text-[11px] leading-relaxed text-slate-400 font-medium">
+                  <p>
+                    © Developed and hosted by <strong className="text-white font-bold">National Informatics Centre</strong>,
+                  </p>
+                  <p>
+                    Ministry of Law &amp; Justice, Information Technology, <strong className="text-white font-bold">Government of India</strong>
+                  </p>
+                </div>
+              </footer>
 
             </div>
-
-            {/* Reusable landing page footer */}
-            <footer className="w-full bg-slate-900 text-white py-12 border-t-4 border-orange-500 mt-12 z-20 text-center">
-              <div className="max-w-7xl mx-auto px-6 space-y-8">
-                {/* Main Footer Links */}
-                <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-xs font-bold text-gray-300 border-b border-white/10 pb-8 uppercase tracking-widest">
-                  <button onClick={() => setToast("About Us page linked.")} className="hover:text-white transition-colors">About Us</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Help documentation linked.")} className="hover:text-white transition-colors">Help</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Site map opened.")} className="hover:text-white transition-colors">Sitemap</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Website Policies and Terms linked.")} className="hover:text-white transition-colors">Website Policies</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Loading feedback desk...")} className="hover:text-white transition-colors">Feedback</button>
-                  <span className="text-white/20">/</span>
-                  <button onClick={() => setToast("Contact Information opened.")} className="hover:text-white transition-colors">Contact Us</button>
-                </div>
-                {/* Copyright details */}
-                <div className="flex flex-col md:flex-row justify-between items-center text-xs text-slate-400 gap-4 text-left">
-                  <div className="text-center md:text-left space-y-1">
-                    <p className="leading-relaxed">
-                      © Developed and hosted by <span className="text-white font-semibold">National Informatics Centre</span>,
-                    </p>
-                    <p className="leading-relaxed">
-                      Ministry of Law &amp; Justice, Information Technology, <span className="text-white font-bold">Government of India</span>
-                    </p>
-                  </div>
-                  <div className="text-center md:text-right font-bold space-y-1">
-                    <p>Last Updated: <span className="text-blue-400">May 27, 2026</span></p>
-                    <p className="text-[10px] text-slate-500 font-semibold uppercase">AURIS Portal version 2.4.2</p>
-                  </div>
-                </div>
-              </div>
-            </footer>
-
           </div>
         )}
 
