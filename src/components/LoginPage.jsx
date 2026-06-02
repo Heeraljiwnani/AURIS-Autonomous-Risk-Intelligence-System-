@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   User, 
   Lock, 
@@ -11,7 +11,7 @@ import {
   UserPlus
 } from 'lucide-react';
 
-export default function LoginPage({ onNavigate }) {
+export default function LoginPage({ onNavigate, selectedRole }) {
   // Form states
   const [isSignUp, setIsSignUp] = useState(false);
   const [identifier, setIdentifier] = useState('');
@@ -22,7 +22,68 @@ export default function LoginPage({ onNavigate }) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   
+  const allDepts = [
+    "Retail Banking Department",
+    "Corporate Banking Department",
+    "Credit & Loans Department",
+    "Risk Management Department",
+    "Compliance Department",
+    "Treasury Department",
+    "Information Technology (IT) Department",
+    "Human Resources (HR) Department",
+    "Internal Audit Department"
+  ];
+  const [departments, setDepartments] = useState(() => {
+    const localDepts = localStorage.getItem('auris_selected_depts');
+    if (localDepts) {
+      try {
+        const parsed = JSON.parse(localDepts);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      } catch (e) {
+        console.warn('Failed to parse local depts:', e);
+      }
+    }
+    return allDepts;
+  });
+
+  const [selectedDepartment, setSelectedDepartment] = useState(() => {
+    const localDepts = localStorage.getItem('auris_selected_depts');
+    if (localDepts) {
+      try {
+        const parsed = JSON.parse(localDepts);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed[0];
+        }
+      } catch (e) {
+        console.warn('Failed to parse local depts:', e);
+      }
+    }
+    return allDepts[0];
+  });
+
+  useEffect(() => {
+    const fetchActiveDepts = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/organisation');
+        if (response.ok) {
+          const data = await response.json();
+          if (data && Array.isArray(data.selected_depts) && data.selected_depts.length > 0) {
+            setDepartments(data.selected_depts);
+            setSelectedDepartment(data.selected_depts[0]);
+            localStorage.setItem('auris_selected_depts', JSON.stringify(data.selected_depts));
+          }
+        }
+      } catch (err) {
+        console.warn('⚠️ Could not fetch active departments from API:', err.message);
+      }
+    };
+    fetchActiveDepts();
+  }, []);
+
   // Parallax background movement
   const [coords, setCoords] = useState({ x: 50, y: 50 });
 
@@ -37,28 +98,88 @@ export default function LoginPage({ onNavigate }) {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const handleSubmit = (e) => {
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setShowAlert(false);
+    setAlertMessage('');
+
     if (isSignUp) {
       if (password !== confirmPassword) {
-        alert("Passwords do not match!");
+        setIsLoading(false);
+        setShowAlert(true);
+        setAlertMessage("Passwords do not match!");
         return;
       }
-      setIsLoading(true);
-      setTimeout(() => {
-        setIsLoading(false);
-        setIsSignUp(false); // Switch to Sign In after signing up
-        alert("Registration request submitted! Please sign in with your credentials.");
-      }, 1500);
-    } else {
-      setIsLoading(true);
-      setShowAlert(false);
 
-      // Simulate Gov Server Authentication Delay
-      setTimeout(() => {
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            fullName,
+            email,
+            password,
+            role: selectedRole,
+            department: selectedRole === 'employee' ? selectedDepartment : null
+          })
+        });
+
+        const data = await response.json();
         setIsLoading(false);
-        onNavigate('dashboard');
-      }, 1200);
+
+        if (response.ok) {
+          setIsSignUp(false); // Switch to Sign In after signing up
+          setIdentifier(email); // Autofill the email in the sign-in field
+          setPassword('');
+          setConfirmPassword('');
+          alert("Registration successful! Please sign in with your credentials.");
+        } else {
+          setShowAlert(true);
+          setAlertMessage(data.message || "Registration failed. Please try again.");
+        }
+      } catch {
+        setIsLoading(false);
+        setShowAlert(true);
+        setAlertMessage("Unable to connect to the secure authentication server.");
+      }
+    } else {
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            identifier,
+            password,
+            role: selectedRole
+          })
+        });
+
+        const data = await response.json();
+        setIsLoading(false);
+
+        if (response.ok) {
+          // Store token and user details in localStorage
+          localStorage.setItem('auris_token', data.token);
+          localStorage.setItem('auris_user', JSON.stringify(data.user));
+          
+          // Redirect to dashboard
+          onNavigate('dashboard');
+        } else {
+          setShowAlert(true);
+          setAlertMessage(data.message || "Invalid credentials. Please consult support.");
+        }
+      } catch {
+        setIsLoading(false);
+        setShowAlert(true);
+        setAlertMessage("Unable to connect to the secure authentication server.");
+      }
     }
   };
 
@@ -103,10 +224,10 @@ export default function LoginPage({ onNavigate }) {
           {/* Navigation Items */}
           <nav className="flex items-center space-x-6 text-sm font-semibold">
             <button 
-              onClick={() => onNavigate('login')}
+              onClick={() => onNavigate('role-selection')}
               className="text-sky-400 border-b-[3px] border-sky-400 pb-1 cursor-pointer transition-colors"
             >
-              Portal Login
+              Change Role
             </button>
           </nav>
 
@@ -119,14 +240,27 @@ export default function LoginPage({ onNavigate }) {
 
           <div className="px-8 pt-10 pb-8 space-y-6">
             
+            {/* Logo Symbol inside a perfect rounded square glass box */}
+            <div className="flex justify-center mb-6">
+              <div className="overflow-hidden rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.35)] border border-white/15 flex items-center justify-center">
+                <img 
+                  src="/auris-logo.png" 
+                  alt="AURIS Symbol" 
+                  className="h-16 w-16 object-cover"
+                />
+              </div>
+            </div>
+
             {/* Greeting / Headings */}
             <div className="text-center space-y-2.5">
-              <h1 className="text-3xl font-bold text-white tracking-tight font-public drop-shadow-sm transition-all duration-300">
-                {isSignUp ? 'Create Account' : 'Welcome to AURIS'}
+              <h1 className="text-2xl font-bold text-white tracking-tight font-public drop-shadow-sm transition-all duration-300">
+                {isSignUp 
+                  ? (selectedRole === 'admin' ? 'Create Admin Account' : 'Create Employee Account') 
+                  : (selectedRole === 'admin' ? 'AURIS Admin Portal' : 'AURIS Employee Portal')}
               </h1>
-              <div className="text-[13px] text-slate-300 font-bold leading-relaxed max-w-[240px] mx-auto transition-all duration-300">
+              <div className="text-[12.5px] text-slate-300 font-bold leading-relaxed max-w-[280px] mx-auto transition-all duration-300">
                 <p>{isSignUp ? 'Secure Access Registration' : 'Autonomous Unified Risk Intelligence'}</p>
-                <p>{isSignUp ? 'Portal' : 'System'}</p>
+                <p>{isSignUp ? 'Portal' : (selectedRole === 'admin' ? 'Sovereign Administrator System' : 'Employee Auditing System')}</p>
               </div>
             </div>
 
@@ -176,6 +310,29 @@ export default function LoginPage({ onNavigate }) {
                       />
                     </div>
                   </div>
+
+                  {selectedRole === 'employee' && (
+                    <div className="space-y-1.5 text-left animate-in fade-in slide-in-from-top-2 duration-300">
+                      <label className="block text-xs font-bold text-sky-300 font-public tracking-wide" htmlFor="department">
+                        Department
+                      </label>
+                      <div className="relative">
+                        <select
+                          id="department"
+                          value={selectedDepartment}
+                          onChange={(e) => setSelectedDepartment(e.target.value)}
+                          className="w-full px-4 py-2.5 bg-slate-900/90 border border-white/10 focus:border-sky-500 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 transition-all text-xs font-bold text-white shadow-sm cursor-pointer"
+                          required
+                        >
+                          {departments.map((dept) => (
+                            <option key={dept} value={dept} className="bg-slate-950 text-white">
+                              {dept}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -291,7 +448,7 @@ export default function LoginPage({ onNavigate }) {
                 <AlertTriangle className="h-4 w-4 text-red-400 mt-0.5 flex-shrink-0" />
                 <div className="text-xs text-left leading-normal font-semibold">
                   <p className="font-bold text-red-200">Access Control Restriction</p>
-                  <p className="text-red-300/80 mt-0.5">Invalid credentials. Please consult your administrator or support desk.</p>
+                  <p className="text-red-300/80 mt-0.5">{alertMessage || 'Invalid credentials. Please consult your administrator or support desk.'}</p>
                 </div>
               </div>
             )}
